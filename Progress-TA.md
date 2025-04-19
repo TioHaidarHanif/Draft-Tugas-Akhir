@@ -74,6 +74,7 @@ Tentu, berikut adalah draft ide Anda tentang sistem helpdesk ticketing yang lebi
 *   **Notifikasi Pengguna:**
     *   **Wajib:** Notifikasi *in-app* (di dalam aplikasi).
     *   **Opsional:** Notifikasi melalui email, Telegram (jika terintegrasi).
+*   **Kategorisasi:** Perkaya kategori dari pengaduan misalnya untuk kategori A. B , C bisa di custom
 
 **5.  Proses Kerja Admin (Di Balik Layar):**
 
@@ -89,4 +90,3 @@ Tentu, berikut adalah draft ide Anda tentang sistem helpdesk ticketing yang lebi
 *   Draft ini masih bersifat konsep awal. Detail implementasi, desain database, alur kerja tiket yang lebih rinci, dan pemilihan teknologi *frontend* perlu diperjelas lebih lanjut.
 *   Pendekatan SPL perlu dipertimbangkan dengan seksama, apakah kompleksitasnya sepadan dengan manfaat *reuse* yang diharapkan di awal proyek. Mungkin lebih baik memulai dengan aplikasi *monolithic* untuk satu instansi, kemudian berevolusi ke SPL.
 
-Draft ini diharapkan memberikan gambaran yang lebih rapi dan terstruktur dari ide Anda.  Apakah ada bagian tertentu yang ingin Anda detailkan atau modifikasi lebih lanjut?
