@@ -1,92 +1,16 @@
-Tentu, berikut adalah draft ide Anda tentang sistem helpdesk ticketing yang lebih rapi dan terstruktur, berdasarkan teks yang Anda berikan sebelumnya:
+1.1.	Latar Belakang
+[LLM Untuk Membantu pekerjaan Manusia]
 
-**Draft Konsep Sistem Helpdesk Ticketing Berbasis Laravel API**
+Akhir-akhir ini, penggunaan LLM mulai populer dan bahkan sering digunakan oleh banyak orang dalam mengerjakan pekeraan. Popularitas ini bermulai dari kemunculan ChatGPT 
+Peningkatan penggunaan LLM mulai 
+Adopsi penggunaan LLM mengalami peningkatan drastis. Peningkatan ini dimulai sejak salah satu kategori dari LLM yaitu chatGPT pertama kali dirilis pada tanggal 30 November 2022 [1]. Bahkan saat ini, pengguna ChatGPT saat ini ada di angka 
+Beberapa tahun terakhir, penggnaan teknologi AI meningkat secara drastis. Fenomena ini bermulai dari kemunculan ChatGPT pada akhir tahun 2022 [1]. LLM yang merupakan bagian dari AI yang paling populer diantara AI yang lain (?). Salah satu faktor popolaritas LLM adalah proses belajar menggunakan teknologi ini tidak terlalu berat karena hanya bermodalkan bahasa manusia saja (?). LLM ini digunakan untuk 
+	====
+Pada era AI (Artificial Intelligent) seperti saat ini, perkembangan teknologi berkembang sangat pesat. Dengan AI, sebuah solusi dari permasalahan  bisa direalisasikan dengan lebih cepat dan lebih murah dengan bantuan AI [2]. Banyak bidang yang merasakan dampak dari perkembangan AI. Salah satu nya adalah dalam ranah Pengembangan Aplikasi [3]. Salah satu bagian dari pengembangan aplikasi adalah membuat kode program [4].
+  Sebelumnya, membuat kode program sering kali membutuhkan biaya yang tinggi, waktu yang lama, serta hanya dapat dilakukan oleh individu yang memiliki pemahaman teknis tentang koding. Namun, seiring dengan perkembangan zaman, situasi mulai berubah. Kini membuat kode program kini dapat dilakukan dengan waktu yang singkat, biaya yang lebih murah bahkan bisa dilakukan oleh orang yang tidak begitu memiliki pemahaman koding sekalipun. Hal ini dapat dilakukan karena AI mampu menghasilkan kode program hanya dengan menggunakan bahasa manusia [3], sehingga orang yang tidak memiliki latar belakang teknis pun dapat melakukannya. 
+Proses pembuatan kode program dapat secara signifikan dipermudah dengan bantuan AI[5]. Bahkan, bedasarkan salah satu systematic literatur review tentang penggunaan AI pada software engineering yang dipublikasikan pada akhir tahun 2024, ada terdapat lebih dari 247 penelitian yang membahas tentang Software Development dan 118 diantaranya spesifik membahas tentang Code Generation[3]. 
+Ada banyak tools berbasis AI yang bisa melakukan code generation[6]. Salah satu nya adalah github copilot. Github Copilot merupakan salah satu Chatbot AI yang bisa terintegrasi langsung dengan berbagai code editor[7]. Salah satu fitur unggulan dari github copilot adalah Agent Mode, salah satu fitur baru yang menawarkan kemudahan dalam pengembangan aplikasi karena dengan fitur ini AI dapat melakukan operasi file pada proyek, menjalankan perintah  di terminal, merespon kesalahan dan masih banyak lagi [8].
 
-**1.  Inti Tujuan Proyek:**
-
-*   Membangun sistem helpdesk berbasis web untuk manajemen keluhan dan dukungan pengguna.
-*   Sistem ini akan berbentuk aplikasi ticketing, memungkinkan pengguna mengajukan keluhan, pertanyaan, atau laporan masalah terkait instansi/divisi.
-*   Tujuan utama adalah memfasilitasi penyelesaian kendala pengguna secara terstruktur dan transparan.
-
-**2.  Fitur Utama Sistem Helpdesk:**
-
-*   **Manajemen Tiket:**
-    *   **Dari Sisi Pengguna (User):**
-        *   Membuat tiket (pengajuan keluhan/pertanyaan).
-        *   Membatalkan tiket (jika belum diproses).
-        *   Memberikan informasi tambahan pada tiket yang sudah ada.
-        *   Melihat status dan progress tiket secara real-time.
-        *   Melihat riwayat (log) tiket.
-        *   Melakukan *follow-up* tiket jika diperlukan.
-    *   **Dari Sisi Admin:**
-        *   Mengelola semua tiket (melihat, mencari, memfilter).
-        *   CRUD (Create, Read, Update, Delete) tiket (mungkin dalam konteks internal admin, bukan menghapus tiket pengguna).
-        *   Mengubah status tiket (misalnya: *Open, Pending, On Progress, Resolved, Closed*).
-        *   Meminta pengguna untuk memberikan update/informasi tambahan pada tiket.
-        *   Memberikan tanggapan/komentar pada tiket.
-        *   Memecah tiket menjadi beberapa tiket yang lebih kecil (jika diperlukan).
-        *   Menggabungkan tiket yang serupa (jika ada duplikasi).
-        *   Melihat statistik dan monitoring tiket (misalnya: jumlah tiket per status, tren keluhan).
-        *   Menindaklanjuti tiket (mendelegasikan ke pihak terkait).
-        *   Memprioritaskan tiket berdasarkan urgensi atau dampak.
-        *   Menolak tiket jika dianggap tidak relevan atau tidak sesuai.
-        *   Penugasan tiket (menentukan admin/petugas yang bertanggung jawab).
-        *   Kategori tiket (mengelompokkan tiket berdasarkan jenis masalah).
-        *   Status tiket (menunjukkan tahapan penyelesaian tiket).
-        *   Komentar tiket (untuk komunikasi antara admin dan pengguna, atau internal admin).
-        *   Riwayat interaksi tiket (mencatat semua aktivitas terkait tiket).
-        *   Pelacakan status tiket (memungkinkan pengguna dan admin memantau perkembangan).
-        *   Progres tiket (visualisasi kemajuan penyelesaian).
-
-*   **Manajemen FAQ (Frequently Asked Questions):**
-    *   **Dari Sisi Admin:**
-        *   CRUD FAQ (membuat, membaca, memperbarui, menghapus FAQ).
-        *   Mengelompokkan FAQ berdasarkan kategori.
-    *   **Dari Sisi Pengguna:**
-        *   Melihat daftar FAQ yang tersedia.
-        *   Mencari FAQ berdasarkan kata kunci.
-
-*   **Manajemen User:**
-    *   **Pengguna (User Biasa):**
-        *   Registrasi akun (opsional, mungkin bisa menggunakan akun yang sudah ada di sistem instansi).
-        *   Login dan Logout.
-        *   Edit profil (informasi dasar).
-    *   **Admin:**
-        *   CRUD akun admin.
-        *   Manajemen role admin (menentukan hak akses dan wewenang).
-        *   Menambah dan menghapus role admin.
-
-**3.  Pendekatan Pengembangan:**
-
-*   **Backend:** Laravel API (fokus pengembangan API terlebih dahulu).
-*   **Frontend:**  Akan dikembangkan terpisah, menggunakan teknologi *frontend* modern (misalnya React, Vue.js, Angular - *tidak disebutkan dalam draft awal, perlu diputuskan kemudian*).
-*   **Metodologi:** Software Product Line (SPL).
-    *   **Domain Analysis:** Mempelajari sistem helpdesk yang sudah ada (analisis fitur umum).
-    *   **Domain Engineering:** Membuat aplikasi helpdesk *general* (core aplikasi yang fleksibel).
-    *   **Requirement Analysis (Instansi Spesifik):** Menganalisis kebutuhan spesifik setiap instansi/divisi (misalnya LAAK Telyu, Admisi).
-    *   **Product Derivation:** Menyesuaikan aplikasi *general* agar sesuai dengan kebutuhan masing-masing instansi.
-
-**4.  Variabilitas dan Konfigurasi (Untuk Pendekatan SPL):**
-
-*   **Database:** Pilihan database (SQLite, MySQL, dll.).
-*   **Autentikasi Login:** Pilihan metode login (email/password biasa, Google Login, integrasi SSO instansi).
-*   **FAQ:**  Pilihan untuk mengaktifkan atau menonaktifkan fitur FAQ.
-*   **Notifikasi Pengguna:**
-    *   **Wajib:** Notifikasi *in-app* (di dalam aplikasi).
-    *   **Opsional:** Notifikasi melalui email, Telegram (jika terintegrasi).
-*   **Kategorisasi:** Perkaya kategori dari pengaduan misalnya untuk kategori A. B , C bisa di custom
-
-**5.  Proses Kerja Admin (Di Balik Layar):**
-
-*   Admin menerima tiket keluhan/pertanyaan dari pengguna.
-*   Admin menghubungi pihak terkait (PIC/divisi terkait) untuk menindaklanjuti masalah (mungkin melalui WA, email, atau sistem internal lain yang sudah ada).
-*   PIC divisi menyelesaikan masalah.
-*   Admin melakukan *follow-up* ke PIC jika masalah belum selesai.
-*   Admin mengupdate status tiket berdasarkan informasi dari PIC atau hasil penyelesaian.
-*   Komunikasi status dan progress ke pengguna dilakukan melalui komentar tiket.
-
-**Catatan Tambahan:**
-
-*   Draft ini masih bersifat konsep awal. Detail implementasi, desain database, alur kerja tiket yang lebih rinci, dan pemilihan teknologi *frontend* perlu diperjelas lebih lanjut.
-*   Pendekatan SPL perlu dipertimbangkan dengan seksama, apakah kompleksitasnya sepadan dengan manfaat *reuse* yang diharapkan di awal proyek. Mungkin lebih baik memulai dengan aplikasi *monolithic* untuk satu instansi, kemudian berevolusi ke SPL.
-
+Salah satu faktor yang menentukan kualitas dari hasil keluaran AI adalah model yang digunakanya [9]. Pada github copilot, pengguna diberikan kebebasan untuk memilih model AI yang digunakan[8]. 
+Namun sampai saat ini penulis belum menemukan penelitian yang melakukan perbandingan model AI dengan kasus pengembangan sistem backend berbasis API secara utuh serta membandingkan nya menggunakan spesifik tools Github Copilot Agent. Hal ini bisa dibilang wajar mengingat fitur tersebut tergolong baru rilis pada awal tahun 2025 [8].
+ Oleh karena itu,  pada penelitian ini penulis mengusulkan melakukan perbandingan antar model AI menggunakan Github Copilot Agent Mode dalam pengembangan sistem Backend berbasis API. Dengan penelitian ini diharapkan memberikan wawasan kepada pembaca terkait kemampuan model AI pada Github Copilot Agent Mode serta membantu dalam menentukan model terbaik untuk mengembangkan aplikasi yang sesuai kebutuhan mereka.
