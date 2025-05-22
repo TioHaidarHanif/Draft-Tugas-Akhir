@@ -20,34 +20,68 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,user,disposisi',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    'unique:users',
+                    function ($attribute, $value, $fail) {
+                        $allowedDomains = [
+                            'student.telkomuniversity.ac.id',
+                            'telkomuniversity.ac.id',
+                            'adminhelpdesk.ac.id'
+                        ];
+                        
+                        $domain = substr(strrchr($value, "@"), 1);
+                        if (!in_array($domain, $allowedDomains)) {
+                            $fail('Email must be a valid Telkom University email address');
+                        }
+                    },
+                ],
+                'password' => 'required|string|min:6|confirmed',
+            ]);
+            
+            // Default role is 'user' unless specified and authorized
+            $role = 'user';
+            if ($request->has('role') && in_array($request->role, ['admin', 'disposisi'])) {
+                // Only admin can create admin or disposisi accounts
+                if (auth()->check() && auth()->user()->role === 'admin') {
+                    $role = $request->role;
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Unauthorized to create this role',
+                        'code' => 403
+                    ], 403);
+                }
+            }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $role,
+            ]);
 
-        // Only admin can create admin or disposisi accounts
-        if (auth()->check() && auth()->user()->role !== 'admin' && in_array($request->role, ['admin', 'disposisi'])) {
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
-                'message' => 'Unauthorized to create this role',
-            ], 403);
+                'status' => 'success',
+                'message' => 'User registered successfully',
+                'token' => $token,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Registration failed',
+                'errors' => $e->errors(),
+                'code' => 422
+            ], 422);
         }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'User registered successfully',
-            'user' => $user,
-            'token' => $token,
-        ], 201);
     }
 
     /**
@@ -59,25 +93,44 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-
-        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+        try {
+            $request->validate([
+                'email' => 'required|string|email',
+                'password' => 'required|string',
             ]);
+
+            if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The provided credentials are incorrect.',
+                    'code' => 401
+                ], 401);
+            }
+
+            $user = User::where('email', $request->email)->firstOrFail();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Login successful',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role
+                    ],
+                    'token' => $token,
+                ]
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Login failed',
+                'errors' => $e->errors(),
+                'code' => 422
+            ], 422);
         }
-
-        $user = User::where('email', $request->email)->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => $user,
-            'token' => $token,
-        ]);
     }
 
     /**
@@ -91,7 +144,8 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logged out successfully',
+            'status' => 'success',
+            'message' => 'Logged out successfully'
         ]);
     }
 
@@ -103,6 +157,19 @@ class AuthController extends Controller
      */
     public function profile(Request $request): JsonResponse
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'created_at' => $user->created_at
+                ]
+            ]
+        ]);
     }
 }
