@@ -1,0 +1,2861 @@
+{
+  "info": {
+    "_postman_id": "46c1e952-8d58-4a5f-8c87-38a0145f4085",
+    "name": "Sistem Keluhan Mahasiswa API",
+    "description": "API untuk Sistem Keluhan Mahasiswa dengan Laravel",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Endpoint untuk autentikasi",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"user@student.telkomuniversity.ac.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"5\",\n    \"phone\": \"081234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Registrasi user baru"
+          },
+          "response": [
+            {
+              "name": "Register Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"user@student.telkomuniversity.ac.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"5\",\n    \"phone\": \"081234567890\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"User registered successfully\",\n    \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n}"
+            },
+            {
+              "name": "Register Failed (Invalid Email)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"user@gmail.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"5\",\n    \"phone\": \"081234567890\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Registration failed\",\n    \"errors\": {\n        \"email\": [\n            \"Email must be a valid Telkom University email address\"\n        ]\n    },\n    \"code\": 422\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@adminhelpdesk.ac.id\",\n    \"password\": \"adminpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login sebagai admin"
+          },
+          "response": [
+            {
+              "name": "Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@adminhelpdesk.ac.id\",\n    \"password\": \"adminpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"user\": {\n            \"id\": 1,\n            \"name\": \"Admin User\",\n            \"email\": \"admin@adminhelpdesk.ac.id\",\n            \"nim\": null,\n            \"role\": \"admin\"\n        },\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n    }\n}"
+            },
+            {
+              "name": "Login Failed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@adminhelpdesk.ac.id\",\n    \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Email atau password yang Anda masukkan salah.\",\n    \"code\": 401\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user@student.telkomuniversity.ac.id\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login sebagai mahasiswa"
+          },
+          "response": [
+            {
+              "name": "Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"user@student.telkomuniversity.ac.id\",\n    \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"user\": {\n            \"id\": 2,\n            \"name\": \"Test User\",\n            \"email\": \"user@student.telkomuniversity.ac.id\",\n            \"nim\": \"1234567890\",\n            \"role\": \"student\"\n        },\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout dari sistem"
+          },
+          "response": [
+            {
+              "name": "Logout Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/logout",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Logged out successfully\"\n}"
+            },
+            {
+              "name": "Logout Failed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/logout",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Unauthorized access\",\n    \"code\": 401\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "Mendapatkan data profil pengguna yang terautentikasi"
+          },
+          "response": [
+            {
+              "name": "Get Profile Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"user\": {\n            \"id\": 2,\n            \"name\": \"Budi Santoso\",\n            \"email\": \"budi@student.telkomuniversity.ac.id\",\n            \"nim\": \"1234567890\",\n            \"prodi\": \"S1 Teknik Informatika\",\n            \"semester\": \"5\",\n            \"phone\": \"081234567890\",\n            \"role\": \"student\",\n            \"created_at\": \"2023-05-15T07:30:21.000000Z\",\n            \"updated_at\": \"2023-05-15T07:30:21.000000Z\"\n        }\n    }\n}"
+            },
+            {
+              "name": "Get Profile Failed",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Unauthorized access\",\n    \"code\": 401\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Budi Santoso\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"6\",\n    \"phone\": \"081234567899\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "Mengupdate data profil pengguna yang terautentikasi"
+          },
+          "response": [
+            {
+              "name": "Update Profile Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Budi Santoso\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"6\",\n    \"phone\": \"081234567899\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Profile updated successfully\",\n    \"data\": {\n        \"user\": {\n            \"id\": 2,\n            \"name\": \"Budi Santoso\",\n            \"email\": \"budi@student.telkomuniversity.ac.id\",\n            \"nim\": \"1234567890\",\n            \"prodi\": \"S1 Teknik Informatika\",\n            \"semester\": \"6\",\n            \"phone\": \"081234567899\",\n            \"role\": \"student\",\n            \"updated_at\": \"2023-05-21T11:45:30.000000Z\"\n        }\n    }\n}"
+            },
+            {
+              "name": "Update Profile Failed",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"6\",\n    \"phone\": \"081234567899\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"The given data was invalid.\",\n    \"errors\": {\n        \"name\": [\"The name field is required.\"]\n    },\n    \"code\": 422\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            },
+            "description": "Mendapatkan data profil user yang login"
+          },
+          "response": [
+            {
+              "name": "Get Profile Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Test User\",\n        \"email\": \"user@student.telkomuniversity.ac.id\",\n        \"nim\": \"1234567890\",\n        \"prodi\": \"S1 Teknik Informatika\",\n        \"semester\": \"5\",\n        \"phone\": \"081234567890\",\n        \"role\": \"student\",\n        \"created_at\": \"2023-05-21T07:30:21.000000Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Name\",\n    \"prodi\": \"S1 Teknik Elektro\",\n    \"semester\": \"6\",\n    \"phone\": \"089876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/profile/update",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "profile",
+                "update"
+              ]
+            },
+            "description": "Update profil user yang login"
+          },
+          "response": [
+            {
+              "name": "Update Profile Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Name\",\n    \"prodi\": \"S1 Teknik Elektro\",\n    \"semester\": \"6\",\n    \"phone\": \"089876543210\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/profile/update",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "profile",
+                    "update"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Profile updated successfully\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Updated Name\",\n        \"email\": \"user@student.telkomuniversity.ac.id\",\n        \"nim\": \"1234567890\",\n        \"prodi\": \"S1 Teknik Elektro\",\n        \"semester\": \"6\",\n        \"phone\": \"089876543210\",\n        \"role\": \"student\",\n        \"updated_at\": \"2023-05-21T15:12:45.000000Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "description": "Endpoint untuk manajemen user (khusus Admin)",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users?role=student&search=budi&page=1&per_page=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "student",
+                  "description": "Filter by role: student, admin, disposisi"
+                },
+                {
+                  "key": "search",
+                  "value": "budi",
+                  "description": "Search by name or email"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Mendapatkan daftar semua user di sistem (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Get Users Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users?role=student&search=budi&page=1&per_page=10",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "role",
+                      "value": "student"
+                    },
+                    {
+                      "key": "search",
+                      "value": "budi"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"users\": [\n            {\n                \"id\": 2,\n                \"name\": \"Budi Santoso\",\n                \"email\": \"budi@student.telkomuniversity.ac.id\",\n                \"nim\": \"1234567890\",\n                \"role\": \"student\",\n                \"created_at\": \"2023-05-15T07:30:21.000000Z\"\n            },\n            {\n                \"id\": 4,\n                \"name\": \"Budi Prakoso\",\n                \"email\": \"prakoso@student.telkomuniversity.ac.id\",\n                \"nim\": \"0987654321\",\n                \"role\": \"student\",\n                \"created_at\": \"2023-05-17T09:45:12.000000Z\"\n            }\n        ],\n        \"pagination\": {\n            \"total\": 2,\n            \"per_page\": 10,\n            \"current_page\": 1,\n            \"last_page\": 1\n        }\n    }\n}"
+            },
+            {
+              "name": "Get Users Failed (Unauthorized)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_token"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Unauthorized access\",\n    \"code\": 401\n}"
+            },
+            {
+              "name": "Get Users Failed (Forbidden)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{student_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"You don't have permission to perform this action\",\n    \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "2"
+              ]
+            },
+            "description": "Mendapatkan detail satu user (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Get User Detail Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Budi Santoso\",\n        \"email\": \"budi@student.telkomuniversity.ac.id\",\n        \"nim\": \"1234567890\",\n        \"prodi\": \"S1 Teknik Informatika\",\n        \"semester\": \"5\",\n        \"phone\": \"081234567890\",\n        \"role\": \"student\",\n        \"created_at\": \"2023-05-15T07:30:21.000000Z\",\n        \"updated_at\": \"2023-05-15T07:30:21.000000Z\"\n    }\n}"
+            },
+            {
+              "name": "Get User Detail Failed (Not Found)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"User not found\",\n    \"code\": 404\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Name\",\n    \"prodi\": \"S1 Teknik Elektro\",\n    \"semester\": \"6\",\n    \"phone\": \"089876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "2"
+              ]
+            },
+            "description": "Mengubah data user (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Update User Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Name\",\n    \"prodi\": \"S1 Teknik Elektro\",\n    \"semester\": \"6\",\n    \"phone\": \"089876543210\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"User updated successfully\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Updated Name\",\n        \"email\": \"budi@student.telkomuniversity.ac.id\",\n        \"nim\": \"1234567890\",\n        \"prodi\": \"S1 Teknik Elektro\",\n        \"semester\": \"6\",\n        \"phone\": \"089876543210\",\n        \"role\": \"student\",\n        \"updated_at\": \"2023-05-21T15:12:45.000000Z\"\n    }\n}"
+            },
+            {
+              "name": "Update User Failed (Forbidden)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{student_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Name\",\n    \"prodi\": \"S1 Teknik Elektro\",\n    \"semester\": \"6\",\n    \"phone\": \"089876543210\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"You don't have permission to perform this action\",\n    \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "2"
+              ]
+            },
+            "description": "Hapus user (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Delete User Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"User deleted successfully\"\n}"
+            },
+            {
+              "name": "Delete User Failed (Forbidden)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{student_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"You don't have permission to perform this action\",\n    \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"disposisi\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/2/role",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "2",
+                "role"
+              ]
+            },
+            "description": "Mengubah role user (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Update Role Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"role\": \"disposisi\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/2/role",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2",
+                    "role"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"User role updated successfully\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Budi Santoso\",\n        \"role\": \"disposisi\"\n    }\n}"
+            },
+            {
+              "name": "Update Role Failed (Invalid Role)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"role\": \"invalid_role\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/2/role",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2",
+                    "role"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"The given data was invalid.\",\n    \"errors\": {\n        \"role\": [\"The selected role is invalid.\"]\n    },\n    \"code\": 422\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "2"
+              ]
+            },
+            "description": "Mendapatkan detail user berdasarkan ID"
+          },
+          "response": [
+            {
+              "name": "Get User Detail Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"user\": {\n            \"id\": 2,\n            \"name\": \"Budi Santoso\",\n            \"email\": \"budi@student.telkomuniversity.ac.id\",\n            \"nim\": \"1234567890\",\n            \"role\": \"student\",\n            \"created_at\": \"2023-05-15T07:30:21.000000Z\",\n            \"updated_at\": \"2023-05-15T07:30:21.000000Z\"\n        }\n    }\n}"
+            },
+            {
+              "name": "Get User Detail Failed (Not Found)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"User not found\",\n    \"code\": 404\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Budi Santoso Updated\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"6\",\n    \"phone\": \"081234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "2"
+              ]
+            },
+            "description": "Mengupdate data user (Admin only untuk user lain, user biasa hanya untuk dirinya sendiri)"
+          },
+          "response": [
+            {
+              "name": "Update User Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Budi Santoso Updated\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"6\",\n    \"phone\": \"081234567890\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"User updated successfully\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Budi Santoso Updated\",\n        \"email\": \"budi@student.telkomuniversity.ac.id\",\n        \"nim\": \"1234567890\",\n        \"role\": \"student\",\n        \"updated_at\": \"2023-05-21T10:15:30.000000Z\"\n    }\n}"
+            },
+            {
+              "name": "Update User Failed (Forbidden)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Budi Santoso Updated\",\n    \"nim\": \"1234567890\",\n    \"prodi\": \"S1 Teknik Informatika\",\n    \"semester\": \"6\",\n    \"phone\": \"081234567890\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"You don't have permission to update this user\",\n    \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "2"
+              ]
+            },
+            "description": "Menghapus user dari sistem (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Delete User Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"User deleted successfully\"\n}"
+            },
+            {
+              "name": "Delete User Failed (Forbidden)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/2",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"You don't have permission to delete users\",\n    \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/statistics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "statistics"
+              ]
+            },
+            "description": "Mendapatkan statistik user dalam sistem (Admin only)"
+          },
+          "response": [
+            {
+              "name": "Get Statistics Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/users/statistics",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "users",
+                    "statistics"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"total_users\": 15,\n        \"students\": 10,\n        \"admins\": 2,\n        \"disposisi\": 3\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ticket Management",
+      "description": "Endpoint untuk manajemen ticket",
+      "item": [
+        {
+          "name": "Create Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "judul",
+                  "value": "Nilai UTS tidak sesuai",
+                  "type": "text"
+                },
+                {
+                  "key": "kategori",
+                  "value": "akademik",
+                  "type": "text"
+                },
+                {
+                  "key": "subKategori",
+                  "value": "nilai",
+                  "type": "text"
+                },
+                {
+                  "key": "deskripsi",
+                  "value": "Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya.",
+                  "type": "text"
+                },
+                {
+                  "key": "nama",
+                  "value": "Budi Santoso",
+                  "type": "text"
+                },
+                {
+                  "key": "nim",
+                  "value": "1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "prodi",
+                  "value": "S1 Teknik Informatika",
+                  "type": "text"
+                },
+                {
+                  "key": "semester",
+                  "value": "5",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "budi@student.telkomuniversity.ac.id",
+                  "type": "text"
+                },
+                {
+                  "key": "noHp",
+                  "value": "081234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "anonymous",
+                  "value": "false",
+                  "type": "text"
+                },
+                {
+                  "key": "lampiran",
+                  "type": "file",
+                  "src": "/path/to/image.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets"
+              ]
+            },
+            "description": "Membuat tiket keluhan baru"
+          },
+          "response": [
+            {
+              "name": "Create Ticket Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Ticket created successfully\",\n    \"data\": {\n        \"id\": \"TKT-20230521-001\",\n        \"nama\": \"Budi Santoso\",\n        \"nim\": \"1234567890\",\n        \"prodi\": \"S1 Teknik Informatika\",\n        \"semester\": \"5\",\n        \"email\": \"budi@student.telkomuniversity.ac.id\",\n        \"noHp\": \"081234567890\",\n        \"kategori\": \"akademik\",\n        \"subKategori\": \"nilai\",\n        \"judul\": \"Nilai UTS tidak sesuai\",\n        \"deskripsi\": \"Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya.\",\n        \"anonymous\": false,\n        \"status\": \"new\",\n        \"lampiran\": {\n            \"name\": \"bukti.jpg\",\n            \"url\": \"https://example.com/storage/bukti.jpg\",\n            \"type\": \"image\"\n        },\n        \"created_at\": \"2023-05-21T08:30:00.000000Z\"\n    }\n}"
+            },
+            {
+              "name": "Create Ticket Failed (Validation Error)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "judul",
+                      "value": "",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"The given data was invalid.\",\n    \"errors\": {\n        \"judul\": [\"The judul field is required.\"],\n        \"deskripsi\": [\"The deskripsi field is required.\"],\n        \"kategori\": [\"The kategori field is required.\"],\n        \"subKategori\": [\"The subKategori field is required.\"]\n    },\n    \"code\": 422\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets?status=new&kategori=akademik&search=nilai&page=1&per_page=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "new",
+                  "description": "Filter by status: new, in_progress, resolved, closed"
+                },
+                {
+                  "key": "kategori",
+                  "value": "akademik",
+                  "description": "Filter by kategori"
+                },
+                {
+                  "key": "search",
+                  "value": "nilai",
+                  "description": "Search in judul or deskripsi"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Mendapatkan daftar tiket (berdasarkan role user)"
+          },
+          "response": [
+            {
+              "name": "Get All Tickets Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets?status=new&kategori=akademik",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "new"
+                    },
+                    {
+                      "key": "kategori",
+                      "value": "akademik"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"tickets\": [\n            {\n                \"id\": \"TKT-20230521-001\",\n                \"nama\": \"Budi Santoso\",\n                \"nim\": \"1234567890\",\n                \"prodi\": \"S1 Teknik Informatika\",\n                \"semester\": \"5\",\n                \"email\": \"budi@student.telkomuniversity.ac.id\",\n                \"noHp\": \"081234567890\",\n                \"kategori\": \"akademik\",\n                \"subKategori\": \"nilai\",\n                \"judul\": \"Nilai UTS tidak sesuai\",\n                \"deskripsi\": \"Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya.\",\n                \"anonymous\": false,\n                \"status\": \"done\",\n                \"lampiran\": {\n                    \"name\": \"bukti.jpg\",\n                    \"url\": \"https://example.com/storage/bukti.jpg\",\n                    \"type\": \"image\"\n                },\n                \"assignedTo\": {\n                    \"id\": \"JzNwBlrwNsROJbiSQmArkDTtbGw2\",\n                    \"name\": \"Disposisi2\",\n                    \"role\": \"disposisi\"\n                },\n                \"feedbackCount\": 1,\n                \"lastFeedback\": {\n                    \"createdByName\": \"sully@adminhelpdesk.ac.id\",\n                    \"timestamp\": \"2023-05-21T10:38:48.000000+07:00\"\n                },\n                \"historyCount\": 2,\n                \"lastHistoryAction\": \"status_update\",\n                \"created_at\": \"2023-05-21T08:30:00.000000Z\",\n                \"updated_at\": \"2023-05-21T08:51:05.000000Z\",\n                \"last_activity\": \"2023-05-21T10:38:48.000000+07:00\"\n            },\n            {\n                \"id\": \"TKT-20230521-002\",\n                \"nama\": \"Anonymous\",\n                \"nim\": null,\n                \"prodi\": \"S1 Teknik Informatika\",\n                \"semester\": \"3\",\n                \"email\": null,\n                \"noHp\": null,\n                \"kategori\": \"akademik\",\n                \"subKategori\": \"dosen\",\n                \"judul\": \"Dosen sering tidak hadir\",\n                \"deskripsi\": \"Dosen mata kuliah X sering tidak hadir tanpa pemberitahuan.\",\n                \"anonymous\": true,\n                \"status\": \"new\",\n                \"lampiran\": null,\n                \"assignedTo\": null,\n                \"feedbackCount\": 0,\n                \"historyCount\": 0,\n                \"created_at\": \"2023-05-21T09:15:22.000000Z\",\n                \"updated_at\": \"2023-05-21T09:15:22.000000Z\",\n                \"last_activity\": \"2023-05-21T09:15:22.000000Z\"\n            }\n        ],\n        \"pagination\": {\n            \"total\": 2,\n            \"per_page\": 10,\n            \"current_page\": 1,\n            \"last_page\": 1\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Ticket Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets/TKT-20230521-001",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "TKT-20230521-001"
+              ]
+            },
+            "description": "Mendapatkan detail tiket"
+          },
+          "response": [
+            {
+              "name": "Get Ticket Detail Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"ticket\": {\n            \"id\": \"TKT-20230521-001\",\n            \"nama\": \"Budi Santoso\",\n            \"nim\": \"1234567890\",\n            \"prodi\": \"S1 Teknik Informatika\",\n            \"semester\": \"5\",\n            \"email\": \"budi@student.telkomuniversity.ac.id\",\n            \"noHp\": \"081234567890\",\n            \"kategori\": \"akademik\",\n            \"subKategori\": \"nilai\",\n            \"judul\": \"Nilai UTS tidak sesuai\",\n            \"deskripsi\": \"Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya.\",\n            \"anonymous\": false,\n            \"status\": \"done\",\n            \"lampiran\": {\n                \"name\": \"bukti.jpg\",\n                \"url\": \"https://example.com/storage/bukti.jpg\",\n                \"type\": \"image\"\n            },\n            \"assignedTo\": {\n                \"id\": \"JzNwBlrwNsROJbiSQmArkDTtbGw2\",\n                \"name\": \"Disposisi2\",\n                \"role\": \"disposisi\"\n            },\n            \"feedback\": [\n                {\n                    \"createdBy\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n                    \"createdByName\": \"sully@adminhelpdesk.ac.id\",\n                    \"createdByRole\": \"admin\",\n                    \"text\": \"Ini feedback saya\",\n                    \"timestamp\": \"2023-05-21T10:38:48.000000+07:00\"\n                }\n            ],\n            \"history\": [\n                {\n                    \"action\": \"assigned\",\n                    \"assignedBy\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n                    \"assignedByName\": \"sully@adminhelpdesk.ac.id\",\n                    \"assignedTo\": \"JzNwBlrwNsROJbiSQmArkDTtbGw2\",\n                    \"assignedToName\": \"Disposisi2\",\n                    \"timestamp\": \"2023-05-21T08:50:55.000000+07:00\"\n                },\n                {\n                    \"action\": \"status_update\",\n                    \"newStatus\": \"done\",\n                    \"oldStatus\": \"in_progress\",\n                    \"timestamp\": \"2023-05-21T08:51:05.000000+07:00\",\n                    \"updatedBy\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n                    \"updatedByName\": \"sully@adminhelpdesk.ac.id\"\n                }\n            ],\n            \"comments\": [],\n            \"created_at\": \"2023-05-21T08:30:00.000000Z\",\n            \"updated_at\": \"2023-05-21T08:51:05.000000Z\"\n        }\n    }\n}"
+            },
+            {
+              "name": "Get Ticket Detail Failed (Not Found)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-999"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Ticket not found\",\n    \"code\": 404\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Ticket Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"in_progress\",\n    \"comment\": \"Tiket sedang dalam proses penanganan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets/TKT-20230521-001/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "TKT-20230521-001",
+                "status"
+              ]
+            },
+            "description": "Mengubah status tiket"
+          },
+          "response": [
+            {
+              "name": "Update Status Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"in_progress\",\n    \"comment\": \"Tiket sedang dalam proses penanganan\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Ticket status updated successfully\",\n    \"data\": {\n        \"id\": \"TKT-20230521-001\",\n        \"status\": \"in_progress\",\n        \"updated_at\": \"2023-05-21T11:30:25.000000Z\",\n        \"history\": [\n            {\n                \"action\": \"status_update\",\n                \"newStatus\": \"in_progress\",\n                \"oldStatus\": \"new\",\n                \"comment\": \"Tiket sedang dalam proses penanganan\",\n                \"timestamp\": \"2023-05-21T11:30:25.000000Z\",\n                \"updatedBy\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n                \"updatedByName\": \"sully@adminhelpdesk.ac.id\",\n                \"updatedByRole\": \"admin\"\n            }\n        ]\n    }\n}"
+            },
+            {
+              "name": "Update Status Failed (Invalid Status)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": \"invalid_status\",\n    \"comment\": \"Status tidak valid\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "status"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"The given data was invalid.\",\n    \"errors\": {\n        \"status\": [\"The selected status is invalid.\"]\n    },\n    \"code\": 422\n}"
+            }
+          ]
+        },
+        {
+          "name": "Assign Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"disposisi_id\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets/TKT-20230521-001/assign",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "TKT-20230521-001",
+                "assign"
+              ]
+            },
+            "description": "Mendisposisikan tiket ke staff"
+          },
+          "response": [
+            {
+              "name": "Assign Ticket Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"disposisi_id\": 3\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/assign",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "assign"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Ticket assigned successfully\",\n    \"data\": {\n        \"id\": \"TKT-20230521-001\",\n        \"assigned_to\": {\n            \"id\": 3,\n            \"name\": \"Susi Susanti\"\n        },\n        \"updated_at\": \"2023-05-21T12:15:10.000000Z\"\n    }\n}"
+            },
+            {
+              "name": "Assign Ticket Failed (Invalid User)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"disposisi_id\": 999\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/assign",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "assign"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Disposisi staff not found\",\n    \"code\": 404\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "content",
+                  "value": "Masalah ini sedang ditangani oleh bagian akademik",
+                  "type": "text"
+                },
+                {
+                  "key": "lampiran",
+                  "type": "file",
+                  "src": "/path/to/file.jpg"
+                },
+                {
+                  "key": "isInternal",
+                  "value": "true",
+                  "type": "text",
+                  "description": "Optional"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets/TKT-20230521-001/comments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "TKT-20230521-001",
+                "comments"
+              ]
+            },
+            "description": "Menambahkan komentar pada tiket"
+          },
+          "response": [
+            {
+              "name": "Add Comment Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "content",
+                      "value": "Masalah ini sedang ditangani oleh bagian akademik",
+                      "type": "text"
+                    },
+                    {
+                      "key": "isInternal",
+                      "value": "true",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/comments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "comments"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Comment added successfully\",\n    \"data\": {\n        \"id\": \"1\",\n        \"content\": \"Masalah ini sedang ditangani oleh bagian akademik\",\n        \"lampiran\": null,\n        \"isInternal\": true,\n        \"user\": {\n            \"id\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n            \"name\": \"Admin User\",\n            \"role\": \"admin\",\n            \"avatar\": null\n        },\n        \"created_at\": \"2023-05-21T12:45:30.000000Z\",\n        \"feedback\": {\n            \"createdBy\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n            \"createdByName\": \"Admin User\",\n            \"createdByRole\": \"admin\",\n            \"text\": \"Masalah ini sedang ditangani oleh bagian akademik\",\n            \"timestamp\": \"2023-05-21T12:45:30.000000Z\"\n        },\n        \"history\": {\n            \"action\": \"feedback_added\",\n            \"timestamp\": \"2023-05-21T12:45:30.000000Z\",\n            \"performedBy\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n            \"performedByName\": \"Admin User\",\n            \"performedByRole\": \"admin\"\n        }\n    }\n}"
+            },
+            {
+              "name": "Add Comment Failed (Empty Comment)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "content",
+                      "value": "",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/comments",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "comments"
+                  ]
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"The given data was invalid.\",\n    \"errors\": {\n        \"content\": [\"The content field is required.\"]\n    },\n    \"code\": 422\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Ticket Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets/statistics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "statistics"
+              ]
+            },
+            "description": "Mendapatkan statistik tiket"
+          },
+          "response": [
+            {
+              "name": "Get Statistics Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets/statistics",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "statistics"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"semua\": 25,\n        \"baru\": 10,\n        \"sedang_proses\": 8,\n        \"selesai\": 7,\n        \"belum_dibaca\": 3\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Ticket",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"judul\": \"Updated: Nilai UTS tidak sesuai\",\n    \"kategori\": \"akademik\",\n    \"subKategori\": \"nilai\",\n    \"deskripsi\": \"Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya. Mohon ditinjau kembali.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets/TKT-20230521-001",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "TKT-20230521-001"
+              ]
+            },
+            "description": "Mengupdate informasi tiket (Admin dan pemilik tiket saja)"
+          },
+          "response": [
+            {
+              "name": "Update Ticket Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"judul\": \"Updated: Nilai UTS tidak sesuai\",\n    \"kategori\": \"akademik\",\n    \"subKategori\": \"nilai\",\n    \"deskripsi\": \"Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya. Mohon ditinjau kembali.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Ticket updated successfully\",\n    \"data\": {\n        \"id\": \"TKT-20230521-001\",\n        \"judul\": \"Updated: Nilai UTS tidak sesuai\",\n        \"kategori\": \"akademik\",\n        \"subKategori\": \"nilai\",\n        \"deskripsi\": \"Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya. Mohon ditinjau kembali.\",\n        \"updated_at\": \"2023-05-21T15:30:25.000000Z\",\n        \"history\": [\n            {\n                \"action\": \"update_ticket\",\n                \"fields\": [\"judul\", \"deskripsi\"],\n                \"timestamp\": \"2023-05-21T15:30:25.000000Z\",\n                \"updatedBy\": \"8TYqB5N8nFWK41GyxY7Nil9UsSN2\",\n                \"updatedByName\": \"sully@adminhelpdesk.ac.id\",\n                \"updatedByRole\": \"admin\"\n            }\n        ]\n    }\n}"
+            },
+            {
+              "name": "Update Ticket Failed (Forbidden)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"judul\": \"Updated: Nilai UTS tidak sesuai\",\n    \"kategori\": \"akademik\",\n    \"subKategori\": \"nilai\",\n    \"deskripsi\": \"Nilai UTS mata kuliah Algoritma tidak sesuai dengan hasil jawaban saya. Mohon ditinjau kembali.\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-002",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-002"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"You don't have permission to update this ticket\",\n    \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Ticket (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets/TKT-20230521-001/soft-delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "TKT-20230521-001",
+                "soft-delete"
+              ]
+            },
+            "description": "Menghapus tiket secara soft delete (tetap tersimpan di database)"
+          },
+          "response": [
+            {
+              "name": "Delete Ticket Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/soft-delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "soft-delete"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Ticket has been removed from your list\",\n    \"data\": {\n        \"id\": \"TKT-20230521-001\",\n        \"hidden_for\": [2],\n        \"history\": [\n            {\n                \"action\": \"hidden\",\n                \"hidden_by\": 2,\n                \"timestamp\": \"2023-05-21T16:15:30.000000Z\"\n            }\n        ]\n    }\n}"
+            },
+            {
+              "name": "Delete Ticket Failed (Not Found)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-nonexistent/soft-delete",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-nonexistent",
+                    "soft-delete"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Ticket not found\",\n    \"code\": 404\n}"
+            }
+          ]
+        },
+        {
+          "name": "Restore Hidden Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets/TKT-20230521-001/restore",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "TKT-20230521-001",
+                "restore"
+              ]
+            },
+            "description": "Mengembalikan tiket yang telah dihapus secara soft delete"
+          },
+          "response": [
+            {
+              "name": "Restore Ticket Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-20230521-001/restore",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-20230521-001",
+                    "restore"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Ticket has been restored to your list\",\n    \"data\": {\n        \"id\": \"TKT-20230521-001\",\n        \"history\": [\n            {\n                \"action\": \"restored\",\n                \"restored_by\": 2,\n                \"timestamp\": \"2023-05-21T16:45:20.000000Z\"\n            }\n        ]\n    }\n}"
+            },
+            {
+              "name": "Restore Ticket Failed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/tickets/TKT-nonexistent/restore",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "tickets",
+                    "TKT-nonexistent",
+                    "restore"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Failed to restore ticket\",\n    \"code\": 400\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "Endpoint untuk manajemen notifikasi",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications?read=false&type=new_ticket&page=1&per_page=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "read",
+                  "value": "false",
+                  "description": "Filter by read status"
+                },
+                {
+                  "key": "type",
+                  "value": "new_ticket",
+                  "description": "Filter by notification type"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Mendapatkan notifikasi pengguna"
+          },
+          "response": [
+            {
+              "name": "Get Notifications Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/notifications?read=false",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "notifications"
+                  ],
+                  "query": [
+                    {
+                      "key": "read",
+                      "value": "false"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"data\": {\n        \"notifications\": [\n            {\n                \"id\": \"1\",\n                \"type\": \"new_ticket\",\n                \"title\": \"Tiket Baru\",\n                \"message\": \"Tiket baru telah dibuat: Nilai UTS tidak sesuai\",\n                \"ticket_id\": \"TKT-20230521-001\",\n                \"recipient_id\": null,\n                \"recipient_roles\": [\"admin\"],\n                \"sender\": {\n                    \"id\": \"2\",\n                    \"name\": \"Budi Santoso\",\n                    \"role\": \"student\"\n                },\n                \"read\": false,\n                \"created_at\": \"2023-05-21T08:30:00.000000Z\"\n            },\n            {\n                \"id\": \"2\",\n                \"type\": \"assignment\",\n                \"title\": \"Tiket Didisposisikan\",\n                \"message\": \"Tiket telah didisposisikan kepada Anda: Dosen sering tidak hadir\",\n                \"ticket_id\": \"TKT-20230521-002\",\n                \"recipient_id\": \"3\",\n                \"recipient_roles\": null,\n                \"sender\": {\n                    \"id\": \"1\",\n                    \"name\": \"Admin User\",\n                    \"role\": \"admin\"\n                },\n                \"read\": false,\n                \"created_at\": \"2023-05-21T10:15:35.000000Z\"\n            }\n        ],\n        \"pagination\": {\n            \"total\": 2,\n            \"per_page\": 10,\n            \"current_page\": 1,\n            \"last_page\": 1\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications/1/read",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "1",
+                "read"
+              ]
+            },
+            "description": "Menandai notifikasi sebagai dibaca"
+          },
+          "response": [
+            {
+              "name": "Mark as Read Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/notifications/1/read",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    "1",
+                    "read"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"Notification marked as read\",\n    \"data\": {\n        \"id\": \"1\",\n        \"read_at\": \"2023-05-21T14:25:10.000000Z\"\n    }\n}"
+            },
+            {
+              "name": "Mark as Read Failed (Not Found)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/notifications/999/read",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    "999",
+                    "read"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"error\",\n    \"message\": \"Notification not found\",\n    \"code\": 404\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications/read-all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
+            },
+            "description": "Menandai semua notifikasi sebagai dibaca"
+          },
+          "response": [
+            {
+              "name": "Mark All as Read Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/notifications/read-all",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "notifications",
+                    "read-all"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"message\": \"All notifications marked as read\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "your_admin_token_here",
+      "type": "string"
+    }
+  ]
+}

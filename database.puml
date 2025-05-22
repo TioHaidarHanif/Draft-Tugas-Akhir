@@ -1,0 +1,113 @@
+@startuml
+
+entity users {
+  * id : VARCHAR(36) <<PK>>
+  --
+  name : VARCHAR
+  email : VARCHAR
+  role : ENUM
+  created_at : TIMESTAMP
+}
+
+entity categories {
+  * id : SERIAL <<PK>>
+  --
+  name : VARCHAR
+}
+
+entity sub_categories {
+  * id : SERIAL <<PK>>
+  --
+  category_id : INT
+  name : VARCHAR
+}
+
+entity tickets {
+  * id : VARCHAR(36) <<PK>>
+  --
+  user_id : VARCHAR(36)
+  anonymous : BOOLEAN
+  judul : VARCHAR
+  deskripsi : TEXT
+  category_id : INT
+  sub_category_id : INT
+  status : ENUM
+  assigned_to : VARCHAR(36)
+  nim : VARCHAR
+  nama : VARCHAR
+  email : VARCHAR
+  prodi : VARCHAR
+  semester : VARCHAR
+  no_hp : VARCHAR
+  read_by_admin : BOOLEAN
+  read_by_disposisi : BOOLEAN
+  read_by_student : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  deleted_at : TIMESTAMP
+}
+
+entity ticket_attachments {
+  * id : SERIAL <<PK>>
+  --
+  ticket_id : VARCHAR(36)
+  file_name : VARCHAR
+  file_type : VARCHAR
+  file_url : TEXT
+  file_base64 : TEXT
+  created_at : TIMESTAMP
+}
+
+entity ticket_histories {
+  * id : SERIAL <<PK>>
+  --
+  ticket_id : VARCHAR(36)
+  action : VARCHAR
+  old_status : VARCHAR
+  new_status : VARCHAR
+  assigned_by : VARCHAR(36)
+  assigned_to : VARCHAR(36)
+  updated_by : VARCHAR(36)
+  timestamp : TIMESTAMP
+}
+
+entity ticket_feedbacks {
+  * id : SERIAL <<PK>>
+  --
+  ticket_id : VARCHAR(36)
+  created_by : VARCHAR(36)
+  text : TEXT
+  created_by_role : VARCHAR
+  created_at : TIMESTAMP
+}
+
+entity notifications {
+  * id : VARCHAR(36) <<PK>>
+  --
+  recipient_id : VARCHAR(36)
+  recipientRole : VARCHAR(36)
+  sender_id : VARCHAR(36)
+  ticket_id : VARCHAR(36)
+  title : VARCHAR
+  message : TEXT
+  type : VARCHAR
+  read_at : TIMESTAMP
+  created_at : TIMESTAMP
+}
+
+' RELATIONS
+users ||--o{ tickets : "creates"
+users ||--o{ ticket_feedbacks : "writes"
+users ||--o{ ticket_histories : "updates"
+users ||--o{ notifications : "sends/receives"
+
+tickets ||--o{ ticket_attachments : "has"
+tickets ||--o{ ticket_histories : "logs"
+tickets ||--o{ ticket_feedbacks : "has"
+tickets ||--o{ notifications : "notified"
+
+categories ||--o{ sub_categories : "contains"
+categories ||--o{ tickets : "categorized"
+sub_categories ||--o{ tickets : "sub-categorized"
+
+@enduml
