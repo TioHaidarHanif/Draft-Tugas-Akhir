@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +11,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Check if tables exist before seeding to prevent errors
+        if (!\Schema::hasTable('categories')) {
+            $this->call(CategorySeeder::class);
+        }
+        
+        if (!\Schema::hasTable('users') || \App\Models\User::count() === 0) {
+            // Only seed users if the table is empty
+            \App\Models\User::factory(10)->create();
+        }
     }
 }
