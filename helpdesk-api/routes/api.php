@@ -29,5 +29,34 @@ Route::prefix('auth')->group(function () {
 
 // Other Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
-    // Add other protected routes here
+    // Routes accessible by all authenticated users
+    Route::get('/dashboard', function() {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User dashboard',
+            'data' => ['user_role' => auth()->user()->role]
+        ]);
+    });
+    
+    // Routes accessible only by admin users
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/admin/dashboard', function() {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Admin dashboard',
+                'data' => ['user_role' => auth()->user()->role]
+            ]);
+        });
+    });
+    
+    // Routes accessible by admin or disposisi users
+    Route::middleware('role:admin,disposisi')->group(function () {
+        Route::get('/staff/dashboard', function() {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Staff dashboard',
+                'data' => ['user_role' => auth()->user()->role]
+            ]);
+        });
+    });
 });
