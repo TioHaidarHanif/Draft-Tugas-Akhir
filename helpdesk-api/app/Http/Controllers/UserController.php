@@ -157,6 +157,7 @@ class UserController extends Controller
         // Only admin can delete users
         if (auth()->user()->role !== 'admin') {
             return response()->json([
+                'status' => 'error',
                 'message' => 'Unauthorized access',
             ], 403);
         }
@@ -164,6 +165,7 @@ class UserController extends Controller
         // Cannot delete yourself
         if (auth()->id() === $user->id) {
             return response()->json([
+                'status' => 'error',
                 'message' => 'Cannot delete your own account',
             ], 403);
         }
@@ -171,7 +173,91 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json([
+            'status' => 'success',
             'message' => 'User deleted successfully',
+        ]);
+    }
+
+    /**
+     * Update user role.
+     *
+     * @param Request $request
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function updateRole(Request $request, User $user): JsonResponse
+    {
+        // Only admin can update roles
+        if (auth()->user()->role !== 'admin') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized access',
+            ], 403);
+        }
+
+        $request->validate([
+            'role' => 'required|in:admin,user,disposisi',
+        ]);
+
+        // Cannot change your own role
+        if (auth()->id() === $user->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot change your own role',
+            ], 403);
+        }
+
+        $user->role = $request->role;
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User role updated successfully',
+            'data' => [
+                'user' => $user,
+            ]
+        ]);
+    }
+
+    /**
+     * Get user statistics (for admin).
+     *
+     * @return JsonResponse
+     */
+    public function statistics(): JsonResponse
+    {
+        // Only admin can view statistics
+        if (auth()->user()->role !== 'admin') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized access',
+            ], 403);
+        }
+
+        // Get counts by role
+        $totalUsers = User::count();
+        $adminUsers = User::where('role', 'admin')->count();
+        $regularUsers = User::where('role', 'user')->count();
+        $disposisiUsers = User::where('role', 'disposisi')->count();
+
+        // Get recent users (last 30 days)
+        $recentUsers = User::where('created_at', '>=', now()->subDays(30))->count();
+
+        // Get active users (with tickets in last 30 days)
+        $activeUsers = User::whereHas('tickets', function ($query) {
+            $query->where('created_at', '>=', now()->subDays(30));
+        })->count();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'total_users' => $totalUsers,
+                'admin_users' => $adminUsers,
+                'regular_users' => $regularUsers,
+                'disposisi_users' => $disposisiUsers,
+                'recent_users' => $recentUsers,
+                'active_users' => $activeUsers,
+            ]
         ]);
     }
 }

@@ -24,22 +24,34 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,user,disposisi',
+            'role' => 'sometimes|in:admin,user,disposisi',
+            'nim' => 'sometimes|string|max:20|nullable',
+            'prodi' => 'sometimes|string|max:100|nullable',
+            'semester' => 'sometimes|string|max:2|nullable',
+            'phone' => 'sometimes|string|max:15|nullable',
         ]);
+
+        // Set default role to 'user' if not provided
+        $role = $request->input('role', 'user');
+
+        // Only admin can create admin or disposisi accounts
+        if (auth()->check() && auth()->user()->role !== 'admin' && in_array($role, ['admin', 'disposisi'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized to create this role',
+            ], 403);
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'role' => $role,
+            'nim' => $request->nim,
+            'prodi' => $request->prodi,
+            'semester' => $request->semester,
+            'phone' => $request->phone,
         ]);
-
-        // Only admin can create admin or disposisi accounts
-        if (auth()->check() && auth()->user()->role !== 'admin' && in_array($request->role, ['admin', 'disposisi'])) {
-            return response()->json([
-                'message' => 'Unauthorized to create this role',
-            ], 403);
-        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -91,6 +103,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Logged out successfully',
         ]);
     }
@@ -104,5 +117,42 @@ class AuthController extends Controller
     public function user(Request $request): JsonResponse
     {
         return response()->json($request->user());
+    }
+
+    /**
+     * Update the authenticated user's profile.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'nim' => 'sometimes|string|max:20|nullable',
+            'prodi' => 'sometimes|string|max:100|nullable',
+            'semester' => 'sometimes|string|max:2|nullable',
+            'phone' => 'sometimes|string|max:15|nullable',
+            'password' => 'sometimes|string|min:8|confirmed|nullable',
+        ]);
+
+        $data = $request->only(['name', 'nim', 'prodi', 'semester', 'phone']);
+        
+        // Only update password if provided
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully',
+            'data' => [
+                'user' => $user
+            ]
+        ]);
     }
 }
