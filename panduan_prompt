@@ -1,0 +1,185 @@
+# PANDUAN PROMPT UNTUK PENGEMBANGAN SISTEM HELPDESK TICKETING
+
+## PERSIAPAN AWAL SEBELUM MELAKUKAN PROMPT
+
+Sebelum memulai prompt untuk pengembangan fitur baru, pastikan untuk:
+
+1. **Memahami Konteks Proyek**
+   - Baca dan pahami `/workspaces/Draft-Tugas-Akhir/context.md` untuk mendapatkan gambaran lengkap tentang sistem
+   - Pelajari struktur database dari `/workspaces/Draft-Tugas-Akhir/database.puml`
+   - Tinjau persyaratan API dari `/workspaces/Draft-Tugas-Akhir/api.md`
+
+2. **Memahami Progres yang Ada**
+   - Periksa `/workspaces/Draft-Tugas-Akhir/progress.md` untuk mengetahui fitur yang sudah diimplementasikan
+   - Pastikan hanya mengerjakan fitur yang belum diimplementasikan
+
+## STRUKTUR PROMPT YANG EFEKTIF
+
+Gunakan struktur berikut untuk membuat prompt yang efektif:
+
+### 1. Prompt untuk Pengembangan Fitur Baru
+
+```
+@agent
+Saya ingin mengembangkan fitur [NAMA_FITUR] untuk sistem Helpdesk Ticketing.
+
+Berdasarkan progress.md, fitur ini belum diimplementasikan.
+
+Fitur ini membutuhkan:
+- [KOMPONEN_1]
+- [KOMPONEN_2]
+- [KOMPONEN_3]
+
+Sesuai dengan api.md, endpoint yang perlu dibuat adalah:
+- [ENDPOINT_1] dengan metode [METHOD]
+- [ENDPOINT_2] dengan metode [METHOD]
+
+Mohon bantu saya untuk:
+1. Membuat implementasi backend untuk fitur ini
+2. Membuat unit test dan feature test untuk memastikan fitur berfungsi
+3. Mendokumentasikan perubahan di progress.md
+```
+
+### 2. Prompt untuk Debug atau Perbaikan
+
+```
+@agent
+Saya mengalami masalah dengan fitur [NAMA_FITUR].
+
+Error yang muncul adalah:
+```
+[COPY_ERROR_MESSAGE]
+```
+
+File yang terlibat:
+- [FILE_PATH_1]
+- [FILE_PATH_2]
+
+Mohon bantu saya untuk:
+1. Mengidentifikasi penyebab error
+2. Menyarankan perbaikan yang sesuai dengan arsitektur sistem
+3. Memastikan perubahan tidak merusak fungsi lain
+```
+
+### 3. Prompt untuk Eksplorasi Kode
+
+```
+@agent
+Saya ingin memahami bagaimana implementasi [KOMPONEN/FITUR] dalam sistem ini.
+
+Secara khusus, saya ingin memahami:
+- Bagaimana relasi antar model diimplementasikan
+- Bagaimana flow data dari request hingga response
+- Bagaimana validasi dan otorisasi diterapkan
+
+Mohon jelaskan dengan referensi ke kode yang sudah ada.
+```
+
+## PRAKTIK TERBAIK DALAM MELAKUKAN PROMPT
+
+1. **Spesifik dan Terstruktur**
+   - Jelaskan dengan tepat fitur yang ingin dikembangkan
+   - Berikan konteks yang cukup (file terkait, error message lengkap)
+   - Batasi cakupan prompt pada satu fitur atau masalah spesifik
+
+2. **Referensi ke Dokumentasi**
+   - Selalu merujuk ke `context.md`, `api.md`, dan `progress.md`
+   - Sebutkan endpoint API yang relevan dari dokumentasi
+   - Gunakan istilah yang konsisten dengan dokumentasi
+
+3. **Iteratif**
+   - Mulai dengan prompt yang sederhana, kemudian perinci
+   - Gunakan hasil prompt sebelumnya sebagai referensi
+   - Gunakan `@agent Continue` untuk melanjutkan pengembangan
+
+4. **Untuk Implementasi Bertahap**
+   - Pisahkan implementasi kompleks menjadi beberapa prompt
+   - Contoh: Prompt 1 untuk model dan migrasi, Prompt 2 untuk controller, Prompt 3 untuk testing
+
+## PEDOMAN PENGEMBANGAN
+
+Selalu pastikan pengembangan mengikuti pedoman berikut:
+
+1. **Praktik Terbaik Laravel**
+   - Gunakan fitur Laravel seperti Resource Controllers, Form Request Validation
+   - Manfaatkan Eloquent Relationships untuk relasi antar model
+   - Terapkan middleware untuk autentikasi dan otorisasi
+
+2. **Desain API RESTful**
+   - Gunakan format respons yang konsisten: `{"status": "success", "data": {...}}`
+   - Untuk error: `{"status": "error", "message": "...", "code": xxx}`
+   - Implementasikan pagination untuk koleksi data
+
+3. **Validasi dan Keamanan**
+   - Validasi semua input dari user
+   - Gunakan authorization checks pada semua endpoint
+   - Pertimbangkan aspek keamanan seperti SQL Injection, XSS, CSRF
+
+4. **Testing**
+   - Buat unit test untuk model dan service
+   - Buat feature test untuk controller dan API endpoint
+   - Uji skenario positif dan edge case
+
+5. **Dokumentasi**
+   - Dokumentasikan semua perubahan di `progress.md`
+   - Sertakan daftar file yang dibuat atau dimodifikasi
+   - Jelaskan keputusan desain yang diambil dan alasannya
+
+## CONTOH PROMPT LENGKAP
+
+```
+@agent
+Saya ingin mengembangkan fitur "Manajemen Kategori" untuk sistem Helpdesk Ticketing.
+
+Berdasarkan progress.md, fitur untuk membuat dan mengelola kategori tiket belum diimplementasikan.
+
+Fitur ini membutuhkan:
+- Model Category dan SubCategory (seharusnya sudah ada)
+- Controller untuk mengelola kategori
+- API endpoint untuk CRUD kategori
+
+Sesuai dengan api.md, endpoint yang perlu dibuat adalah:
+- GET /categories untuk mendapatkan semua kategori
+- POST /categories untuk membuat kategori baru (admin only)
+- POST /categories/{category_id}/sub-categories untuk membuat sub-kategori
+
+Mohon bantu saya untuk:
+1. Membuat CategoryController dengan metode index dan store
+2. Membuat SubCategoryController atau metode di CategoryController untuk mengelola sub-kategori
+3. Menerapkan otorisasi agar hanya admin yang bisa membuat kategori
+4. Membuat unit test dan feature test
+5. Mendokumentasikan perubahan di progress.md
+```
+
+## DOKUMENTASI SETELAH PENGEMBANGAN
+
+Setelah mengimplementasikan fitur, pastikan untuk memperbarui `progress.md` dengan format berikut:
+
+```
+### [Nama Fitur] (Tanggal)
+
+#### Implementasi yang Diselesaikan
+- Deskripsi implementasi 1
+- Deskripsi implementasi 2
+- Deskripsi implementasi 3
+
+#### File yang Dibuat/Dimodifikasi
+- `/path/to/file1.php`
+- `/path/to/file2.php`
+- `/path/to/file3.php`
+
+#### Keputusan Desain
+1. Alasan memilih pendekatan A daripada B
+2. Pertimbangan performa atau keamanan
+3. Trade-off yang diambil
+
+#### Known Issues atau Limitasi (jika ada)
+- Issue 1 dan cara mengatasinya
+- Limitasi 2 dan alternatifnya
+
+#### Langkah Selanjutnya
+- Saran pengembangan berikutnya
+- Fitur terkait yang bisa dikembangkan
+```
+
+Dengan mengikuti panduan ini, pengembangan sistem Helpdesk Ticketing akan berjalan dengan terstruktur, terdokumentasi dengan baik, dan sesuai dengan standar pengembangan yang ditetapkan.

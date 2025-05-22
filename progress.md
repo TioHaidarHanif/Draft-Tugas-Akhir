@@ -43,15 +43,12 @@
 
 #### Controllers Created
 - Created `AuthController` for user registration, login, and logout
-- Created `UserController` for user CRUD operations
 
 #### Routes Created
 - Added authentication routes for register, login, logout
-- Added user management routes with proper authorization
 
 #### Tests Created
 - Created `AuthTest` to test authentication functionality
-- Created `UserControllerTest` to test user management
 
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
@@ -96,7 +93,6 @@
 
 ### Controllers
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
-- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
 
 ### Routes
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/routes/api.php`
@@ -111,4 +107,3 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/TicketFeedbackTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/NotificationTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/AuthTest.php`
-- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/UserControllerTest.php`
