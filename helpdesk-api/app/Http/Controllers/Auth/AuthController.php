@@ -101,7 +101,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function user(Request $request): JsonResponse
+    public function profile(Request $request): JsonResponse
     {
         return response()->json($request->user());
     }

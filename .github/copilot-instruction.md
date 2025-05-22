@@ -6,7 +6,7 @@ When working on this project, follow these instructions:
 
 1. First, read and understand the project context from `/workspaces/Draft-Tugas-Akhir/context.md`
 2. Understand the database schema from `/workspaces/Draft-Tugas-Akhir/database.puml`
-3. Review the API requirements from `/workspaces/Draft-Tugas-Akhir/Postman.json`
+3. Review the API requirements from `/workspaces/Draft-Tugas-Akhir/api.md`
 
 ## Development Process
 
