@@ -27,7 +27,7 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// Other Protected Routes
+// Other Protected Routes (For Test)
 Route::middleware('auth:sanctum')->group(function () {
     // Routes accessible by all authenticated users
     Route::get('/dashboard', function() {

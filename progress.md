@@ -47,8 +47,15 @@
 #### Routes Created
 - Added authentication routes for register, login, logout
 
+#### Middleware Created
+- Created `CheckRole` middleware for role-based authorization
+  - Supports role-based access control for `admin`, `disposisi`, and `student` users
+  - Returns appropriate JSON responses for unauthorized (401) and forbidden (403) requests
+  - Tested with various scenarios using `RoleMiddlewareTest`
+
 #### Tests Created
 - Created `AuthTest` to test authentication functionality
+- Created `RoleMiddlewareTest` to test role-based access control
 
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
@@ -94,6 +101,9 @@
 ### Controllers
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
 
+### Middleware
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
+
 ### Routes
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/routes/api.php`
 
@@ -107,3 +117,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/TicketFeedbackTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/NotificationTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/AuthTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Middleware/RoleMiddlewareTest.php`
