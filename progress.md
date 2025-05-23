@@ -57,6 +57,24 @@
 - Created `AuthTest` to test authentication functionality
 - Created `RoleMiddlewareTest` to test role-based access control
 
+### User Management (May 23, 2025)
+
+#### Controller Created
+- Created `UserController` for user CRUD and statistics operations
+
+#### Routes Created
+- Added user management endpoints (GET /users, GET /users/{id}, PATCH /users/{id}, PATCH /users/{id}/role, DELETE /users/{id}, GET /users/statistics) with admin-only access
+
+#### Middleware
+- Ensured all user management endpoints are protected by `CheckRole` middleware (admin only)
+
+#### Tests Created
+- Created `UserManagementTest` to test all user management endpoints and role restrictions
+
+#### Implementation
+- Implemented all methods in `UserController` for CRUD and statistics
+- All endpoints return JSON responses and proper error handling
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -100,6 +118,7 @@
 
 ### Controllers
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -118,3 +137,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/NotificationTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/AuthTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Middleware/RoleMiddlewareTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/UserManagementTest.php`
