@@ -16,13 +16,13 @@ class UserTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $this->assertDatabaseHas('users', [
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'role' => 'user',
+            'role' => 'student',
         ]);
     }
 
@@ -56,7 +56,7 @@ class UserTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $this->assertEmpty($user->tickets);

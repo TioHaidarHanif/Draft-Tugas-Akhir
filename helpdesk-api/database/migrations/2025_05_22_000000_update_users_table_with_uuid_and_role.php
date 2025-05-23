@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -18,7 +19,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
-            $table->enum('role', ['admin', 'user', 'disposisi'])->default('user');
+            $table->enum('role', ['admin', 'student', 'disposisi'])->default('student');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
@@ -32,7 +33,7 @@ return new class extends Migration
                 'id' => Str::uuid()->toString(),
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => 'user',
+                'role' => 'student',
                 'email_verified_at' => $user->email_verified_at,
                 'password' => $user->password,
                 'remember_token' => $user->remember_token,

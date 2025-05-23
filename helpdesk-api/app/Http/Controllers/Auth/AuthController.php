@@ -45,8 +45,8 @@ class AuthController extends Controller
                 'password' => 'required|string|min:6|confirmed',
             ]);
             
-            // Default role is 'user' unless specified and authorized
-            $role = 'user';
+            // Default role is 'student' unless specified and authorized
+            $role = 'student';
             if ($request->has('role') && in_array($request->role, ['admin', 'disposisi'])) {
                 // Only admin can create admin or disposisi accounts
                 if (auth()->check() && auth()->user()->role === 'admin') {

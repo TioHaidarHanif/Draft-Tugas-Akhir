@@ -35,7 +35,7 @@ class RoleSeeder extends Seeder
             'name' => 'Regular User',
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
     }
 }

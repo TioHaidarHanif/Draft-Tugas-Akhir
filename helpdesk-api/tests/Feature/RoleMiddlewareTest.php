@@ -19,7 +19,7 @@ class RoleMiddlewareTest extends TestCase
             'name' => 'Regular User',
             'email' => 'user@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -32,7 +32,7 @@ class RoleMiddlewareTest extends TestCase
                 'status' => 'success',
                 'message' => 'User dashboard',
                 'data' => [
-                    'user_role' => 'user'
+                    'user_role' => 'student'
                 ]
             ]);
     }
@@ -46,7 +46,7 @@ class RoleMiddlewareTest extends TestCase
             'name' => 'Regular User',
             'email' => 'user@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -125,7 +125,7 @@ class RoleMiddlewareTest extends TestCase
             'name' => 'Regular User',
             'email' => 'user@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

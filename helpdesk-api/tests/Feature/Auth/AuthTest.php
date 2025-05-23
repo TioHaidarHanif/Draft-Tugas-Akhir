@@ -28,7 +28,7 @@ class AuthTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'email' => 'test@student.telkomuniversity.ac.id',
-            'role' => 'user',
+            'role' => 'student',
         ]);
     }
 
@@ -38,7 +38,7 @@ class AuthTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $response = $this->postJson('/api/auth/register', [
@@ -79,7 +79,7 @@ class AuthTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $response = $this->postJson('/api/auth/login', [
@@ -113,7 +113,7 @@ class AuthTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $response = $this->postJson('/api/auth/login', [
@@ -135,7 +135,7 @@ class AuthTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -159,7 +159,7 @@ class AuthTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@student.telkomuniversity.ac.id',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -175,7 +175,7 @@ class AuthTest extends TestCase
                         'id' => $user->id,
                         'name' => 'Test User',
                         'email' => 'test@student.telkomuniversity.ac.id',
-                        'role' => 'user',
+                        'role' => 'student',
                     ]
                 ]
             ]);

@@ -26,7 +26,7 @@ class TicketTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         // Create a category

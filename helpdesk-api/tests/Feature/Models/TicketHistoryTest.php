@@ -28,7 +28,7 @@ class TicketHistoryTest extends TestCase
             'name' => 'Test User',
             'email' => 'user@example.com',
             'password' => bcrypt('password'),
-            'role' => 'user',
+            'role' => 'student',
         ]);
 
         $this->adminUser = User::create([

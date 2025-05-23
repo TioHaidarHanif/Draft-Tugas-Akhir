@@ -129,8 +129,6 @@ Detail lengkap endpoint API dapat dilihat di dokumentasi API dalam `api.md`.
 
 ### Fitur 3: Manajemen Profil
 - Implementasi API untuk melihat profil pengguna saat ini
-- Implementasi API untuk mengupdate profil pengguna (nama, nim, prodi, semester, phone)
-- Validasi data profil untuk memastikan integritas data
 
 ### Fitur 4: Manajemen Pengguna (Admin)
 - Implementasi API untuk melihat daftar pengguna dengan paginasi dan filter berdasarkan role
