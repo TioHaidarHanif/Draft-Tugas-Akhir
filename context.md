@@ -39,7 +39,7 @@ Sistem Keluhan Mahasiswa adalah aplikasi berbasis web yang dirancang untuk memfa
 - Statistik tiket untuk pemantauan dan analisis (total, per status, per kategori, waktu resolusi)
 
 ## Arsitektur Sistem
-- Backend: Laravel (PHP Framework)
+- Backend: Laravel 12 (PHP Framework)
 - API: RESTful API
 - Database: MySQL
 - Autentikasi: Laravel Sanctum
