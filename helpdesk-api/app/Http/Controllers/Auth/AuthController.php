@@ -49,7 +49,7 @@ class AuthController extends Controller
             $role = 'student';
             if ($request->has('role') && in_array($request->role, ['admin', 'disposisi'])) {
                 // Only admin can create admin or disposisi accounts
-                if (auth()->check() && auth()->user()->role === 'admin') {
+                if (Auth::check() && Auth::user()->role === 'admin') {
                     $role = $request->role;
                 } else {
                     return response()->json([
