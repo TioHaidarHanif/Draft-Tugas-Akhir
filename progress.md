@@ -65,6 +65,30 @@
 5. Set up appropriate foreign key constraints to maintain referential integrity
 6. Designed database schema to support both authenticated and anonymous ticket submissions
 
+### User Management (May 23, 2025)
+
+#### Controllers Enhanced
+- Enhanced `UserController` with complete CRUD operations for user management
+  - Implemented endpoints for listing, viewing, updating, and deleting users
+  - Added role management functionality
+  - Created user statistics endpoint for admin dashboard
+
+#### Routes Added
+- Added user management routes (admin only)
+  - GET `/users` to retrieve all users
+  - GET `/users/{id}` to retrieve a specific user
+  - PATCH `/users/{id}` to update user information
+  - PATCH `/users/{id}/role` to update user role
+  - DELETE `/users/{id}` to delete a user
+  - GET `/users/statistics` to get user statistics
+
+#### Tests Created
+- Created `UserControllerTest` for testing user management functionality
+  - Tests for user listing, retrieval, updates, and deletion
+  - Tests for role management
+  - Tests for user statistics
+  - Tests for authorization (ensuring only admins can access)
+
 ### Next Steps
 1. Create ticket management API endpoints
 2. Implement ticket feedback and history tracking
@@ -100,6 +124,7 @@
 
 ### Controllers
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -118,3 +143,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/NotificationTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/AuthTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Middleware/RoleMiddlewareTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/UserControllerTest.php`

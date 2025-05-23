@@ -47,6 +47,14 @@ Route::middleware('auth:sanctum')->group(function () {
                 'data' => ['user_role' => auth()->user()->role]
             ]);
         });
+        
+        // User Management Routes (Admin only)
+        Route::get('/users/statistics', [UserController::class, 'statistics']);
+        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
+        Route::patch('/users/{id}', [UserController::class, 'update']);
+        Route::patch('/users/{id}/role', [UserController::class, 'updateRole']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
     });
     
     // Routes accessible by admin or disposisi users
