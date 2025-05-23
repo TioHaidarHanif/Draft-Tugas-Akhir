@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// Public Routes - No Authentication Required
+// This ensures the categories index route is outside any auth middleware
+Route::get('/categories', [CategoryController::class, 'index']);
 
 // Authentication Routes
 Route::prefix('auth')->group(function () {
@@ -55,6 +60,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/users/{id}', [UserController::class, 'update']);
         Route::patch('/users/{id}/role', [UserController::class, 'updateRole']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
+        
+        // Category Management Routes (Admin only)
+        // Note: GET /categories is defined as a public route above
+        Route::post('/categories', [CategoryController::class, 'store']);
+        Route::get('/categories/{id}', [CategoryController::class, 'show']);
+        Route::put('/categories/{id}', [CategoryController::class, 'update']);
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+        
+        // SubCategory Management Routes (Admin only)
+        Route::post('/categories/{category_id}/sub-categories', [CategoryController::class, 'storeSubCategory']);
+        Route::put('/categories/{category_id}/sub-categories/{subcategory_id}', [CategoryController::class, 'updateSubCategory']);
+        Route::delete('/categories/{category_id}/sub-categories/{subcategory_id}', [CategoryController::class, 'destroySubCategory']);
     });
     
     // Routes accessible by admin or disposisi users

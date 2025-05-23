@@ -89,6 +89,37 @@
   - Tests for user statistics
   - Tests for authorization (ensuring only admins can access)
 
+### Category & SubCategory Management (May 23, 2025)
+
+#### Controllers Created
+- Created `CategoryController` with complete CRUD operations for category and subcategory management
+  - Implemented endpoints for listing, creating, updating, and deleting categories
+  - Implemented endpoints for creating, updating, and deleting subcategories
+  - Added validation for unique category and subcategory names
+  - Added proper error handling and response formatting
+
+#### Routes Added
+- Added public category route for all users
+  - GET `/categories` to retrieve all categories with their subcategories
+  
+- Added category management routes (admin only)
+  - POST `/categories` to create a new category
+  - GET `/categories/{id}` to retrieve a specific category
+  - PUT `/categories/{id}` to update a category
+  - DELETE `/categories/{id}` to delete a category
+
+- Added subcategory management routes (admin only)
+  - POST `/categories/{category_id}/sub-categories` to create a new subcategory
+  - PUT `/categories/{category_id}/sub-categories/{subcategory_id}` to update a subcategory
+  - DELETE `/categories/{category_id}/sub-categories/{subcategory_id}` to delete a subcategory
+
+#### Tests Created
+- Created `CategoryControllerTest` for testing category and subcategory management
+  - Tests for listing, creating, updating, and deleting categories
+  - Tests for creating, updating, and deleting subcategories
+  - Tests for validation (ensuring unique names)
+  - Tests for authorization (ensuring only admins can modify categories)
+
 ### Next Steps
 1. Create ticket management API endpoints
 2. Implement ticket feedback and history tracking
@@ -125,6 +156,7 @@
 ### Controllers
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -144,3 +176,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/AuthTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Middleware/RoleMiddlewareTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/UserControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/CategoryControllerTest.php`
