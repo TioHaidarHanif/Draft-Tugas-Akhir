@@ -49,6 +49,56 @@
 
 #### Middleware Created
 - Created `CheckRole` middleware for role-based authorization
+
+### Ticket Management (May 24, 2025)
+
+#### Controllers Created
+- Created `TicketController` with comprehensive CRUD operations:
+  - `store()` for creating new tickets
+  - `index()` for listing tickets with filtering and pagination
+  - `show()` for viewing ticket details
+  - `updateStatus()` for changing ticket status
+  - `assign()` for assigning tickets to disposisi members
+  - `statistics()` for getting ticket statistics
+  - `addFeedback()` for adding comments to tickets
+  - `destroy()` for soft-deleting tickets
+  - `restore()` for restoring soft-deleted tickets
+
+#### Notification System Implemented
+- Automatic notifications for various ticket events:
+  - New ticket creation
+  - Ticket status changes
+  - Ticket assignments
+  - New feedback/comments
+
+#### Role-Based Authorization
+- Implemented role-based access control for ticket operations:
+  - Students can view and manage only their own tickets
+  - Disposisi members can view and manage assigned tickets
+  - Admins have full access to all tickets
+
+#### Routes Created
+- Added ticket management routes:
+  - POST `/tickets` for creating tickets
+  - GET `/tickets` for listing tickets
+  - GET `/tickets/{id}` for viewing ticket details
+  - PATCH `/tickets/{id}/status` for updating ticket status
+  - POST `/tickets/{id}/assign` for assigning tickets (admin only)
+  - GET `/tickets/statistics` for ticket statistics
+  - POST `/tickets/{id}/feedback` for adding feedback
+  - DELETE `/tickets/{id}` for soft-deleting tickets
+  - POST `/tickets/{id}/restore` for restoring deleted tickets
+
+#### Tests Created
+- Created `TicketManagementTest` with comprehensive test cases:
+  - Testing ticket creation
+  - Testing ticket listing with filters
+  - Testing ticket detail views with proper authorization
+  - Testing status updates with role-based restrictions
+  - Testing ticket assignment
+  - Testing statistics generation
+  - Testing feedback addition
+  - Testing soft delete and restore functionality
   - Supports role-based access control for `admin`, `disposisi`, and `student` users
   - Returns appropriate JSON responses for unauthorized (401) and forbidden (403) requests
   - Tested with various scenarios using `RoleMiddlewareTest`

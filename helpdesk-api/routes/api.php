@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,5 +84,36 @@ Route::middleware('auth:sanctum')->group(function () {
                 'data' => ['user_role' => auth()->user()->role]
             ]);
         });
+    });
+    
+    // Ticket Management Routes
+    // Create ticket (all authenticated users)
+    Route::post('/tickets', [TicketController::class, 'store']);
+    
+    // Get ticket list (role-based filtering applied in controller)
+    Route::get('/tickets', [TicketController::class, 'index']);
+    
+    // Get ticket statistics (role-based filtering applied in controller)
+    Route::get('/tickets/statistics', [TicketController::class, 'statistics']);
+    
+    // Get ticket details (authorization checked in controller)
+    Route::get('/tickets/{id}', [TicketController::class, 'show']);
+    
+    // Update ticket status (authorization checked in controller)
+    Route::patch('/tickets/{id}/status', [TicketController::class, 'updateStatus']);
+    
+    // Add feedback to ticket (authorization checked in controller)
+    Route::post('/tickets/{id}/feedback', [TicketController::class, 'addFeedback']);
+    
+    // Soft delete ticket (authorization checked in controller)
+    Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
+    
+    // Admin-only ticket routes
+    Route::middleware('role:admin')->group(function () {
+        // Assign ticket to disposisi
+        Route::post('/tickets/{id}/assign', [TicketController::class, 'assign']);
+        
+        // Restore deleted ticket
+        Route::post('/tickets/{id}/restore', [TicketController::class, 'restore']);
     });
 });
