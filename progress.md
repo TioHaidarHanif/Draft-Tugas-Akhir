@@ -102,6 +102,15 @@
 - Implemented all methods in `CategoryController` for required endpoints
 - All endpoints return JSON responses and proper error handling
 
+## [Tanggal: 2025-05-24] Implementasi Fitur Manajemen Ticket
+
+- Menambahkan endpoint manajemen ticket (POST, GET, PATCH, DELETE, RESTORE) di TicketController.
+- Implementasi validasi input menggunakan FormRequest (StoreTicketRequest, UpdateTicketStatusRequest, AssignTicketRequest, AddTicketFeedbackRequest, TicketListFilterRequest).
+- Implementasi notifikasi otomatis pada event ticket (pembuatan, perubahan status, assignment, feedback) sesuai spesifikasi API.
+- Menambah relasi model Ticket: attachment, histories, feedbacks.
+- Menambah feature test untuk TicketController (create, list, assign, update status, soft delete, restore).
+- Semua endpoint sudah membatasi akses berbasis role sesuai kebutuhan.
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -147,6 +156,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/TicketController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -166,3 +176,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/AuthTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Middleware/RoleMiddlewareTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/UserManagementTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Ticket/TicketControllerTest.php`

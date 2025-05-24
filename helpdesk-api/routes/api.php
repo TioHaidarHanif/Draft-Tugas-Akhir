@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -75,4 +76,15 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Category & SubCategory Management Endpoints (accessible by all authenticated users)
     Route::get('/categories', [CategoryController::class, 'index']);
+    
+    // Ticket Management Endpoints (all authenticated users, with role-based restrictions in controller)
+    Route::post('/tickets', [TicketController::class, 'store']);
+    Route::get('/tickets', [TicketController::class, 'index']);
+    Route::get('/tickets/statistics', [TicketController::class, 'statistics']);
+    Route::get('/tickets/{id}', [TicketController::class, 'show']);
+    Route::patch('/tickets/{id}/status', [TicketController::class, 'updateStatus']);
+    Route::post('/tickets/{id}/assign', [TicketController::class, 'assign']);
+    Route::post('/tickets/{id}/feedback', [TicketController::class, 'addFeedback']);
+    Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
+    Route::post('/tickets/{id}/restore', [TicketController::class, 'restore']);
 });

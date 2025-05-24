@@ -88,15 +88,23 @@ class Ticket extends Model
     /**
      * Get the attachments for the ticket.
      */
-    public function attachments(): HasMany
+    public function attachments()
     {
         return $this->hasMany(TicketAttachment::class);
     }
 
     /**
+     * Get the attachment for the ticket (first attachment only).
+     */
+    public function attachment()
+    {
+        return $this->hasOne(TicketAttachment::class)->latestOfMany();
+    }
+
+    /**
      * Get the histories for the ticket.
      */
-    public function histories(): HasMany
+    public function histories()
     {
         return $this->hasMany(TicketHistory::class);
     }
@@ -104,7 +112,7 @@ class Ticket extends Model
     /**
      * Get the feedbacks for the ticket.
      */
-    public function feedbacks(): HasMany
+    public function feedbacks()
     {
         return $this->hasMany(TicketFeedback::class);
     }
