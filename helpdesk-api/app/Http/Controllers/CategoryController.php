@@ -14,7 +14,23 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::with('subCategories')->get();
-        return response()->json($categories);
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'categories' => $categories->map(function ($category) {
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'sub_categories' => $category->subCategories->map(function ($sub) {
+                            return [
+                                'id' => $sub->id,
+                                'name' => $sub->name,
+                            ];
+                        }),
+                    ];
+                })
+            ]
+        ]);
     }
 
     // POST /categories (admin only)
@@ -25,10 +41,22 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+                'code' => 422
+            ], 422);
         }
         $category = Category::create(['name' => $request->name]);
-        return response()->json($category, 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Category created successfully',
+            'data' => [
+                'id' => $category->id,
+                'name' => $category->name
+            ]
+        ], 201);
     }
 
     // POST /categories/{category}/sub-categories (admin only)
@@ -39,11 +67,24 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:sub_categories,name,NULL,id,category_id,' . $categoryId,
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+                'code' => 422
+            ], 422);
         }
         $category = Category::findOrFail($categoryId);
         $subCategory = $category->subCategories()->create(['name' => $request->name]);
-        return response()->json($subCategory, 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sub-category created successfully',
+            'data' => [
+                'id' => $subCategory->id,
+                'category_id' => $category->id,
+                'name' => $subCategory->name
+            ]
+        ], 201);
     }
 
     // Helper for role check

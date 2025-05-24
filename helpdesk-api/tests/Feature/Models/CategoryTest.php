@@ -63,7 +63,15 @@ class CategoryTest extends TestCase
         $admin = \App\Models\User::factory()->asAdmin()->create();
         $payload = ['name' => 'Test Category'];
         $response = $this->actingAs($admin, 'sanctum')->postJson('/api/categories', $payload);
-        $response->assertStatus(201)->assertJsonFragment(['name' => 'Test Category']);
+        $response->assertStatus(201)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Category created successfully',
+                'data' => [
+                    'id' => $response['data']['id'],
+                    'name' => 'Test Category',
+                ]
+            ]);
         $this->assertDatabaseHas('categories', ['name' => 'Test Category']);
     }
 
@@ -81,7 +89,16 @@ class CategoryTest extends TestCase
         $category = Category::factory()->create();
         $payload = ['name' => 'Test SubCategory'];
         $response = $this->actingAs($admin, 'sanctum')->postJson("/api/categories/{$category->id}/sub-categories", $payload);
-        $response->assertStatus(201)->assertJsonFragment(['name' => 'Test SubCategory']);
+        $response->assertStatus(201)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Sub-category created successfully',
+                'data' => [
+                    'id' => $response['data']['id'],
+                    'category_id' => $category->id,
+                    'name' => 'Test SubCategory',
+                ]
+            ]);
         $this->assertDatabaseHas('sub_categories', ['name' => 'Test SubCategory', 'category_id' => $category->id]);
     }
 
@@ -101,8 +118,19 @@ class CategoryTest extends TestCase
         $user = \App\Models\User::factory()->asUser()->create();
         $response = $this->actingAs($user, 'sanctum')->getJson('/api/categories');
         $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'Parent Category'])
-            ->assertJsonFragment(['name' => 'Child SubCategory']);
+            ->assertJson([
+                'status' => 'success',
+                'data' => [
+                    'categories' => [[
+                        'id' => $category->id,
+                        'name' => 'Parent Category',
+                        'sub_categories' => [[
+                            'id' => $sub->id,
+                            'name' => 'Child SubCategory',
+                        ]],
+                    ]]
+                ]
+            ]);
     }
 
     public function test_category_name_is_required()
