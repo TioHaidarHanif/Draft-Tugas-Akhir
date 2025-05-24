@@ -75,6 +75,33 @@
 - Implemented all methods in `UserController` for CRUD and statistics
 - All endpoints return JSON responses and proper error handling
 
+### Category & Subcategory Management (May 24, 2025)
+
+#### Controller Created
+- Created `CategoryController` for category and subcategory CRUD operations
+
+#### Routes Created
+- Added endpoints:
+  - GET /categories (all authenticated users)
+  - POST /categories (admin only)
+  - POST /categories/{category_id}/sub-categories (admin only)
+
+#### Middleware
+- Protected create/update/delete category & subcategory endpoints with `CheckRole` middleware (admin only)
+
+#### Validation
+- Implemented input validation for category and subcategory creation
+
+#### Tests Created
+- Added tests in `CategoryTest` for:
+  - Admin and non-admin access to create category/subcategory
+  - Input validation
+  - Fetching categories with subcategories
+
+#### Implementation
+- Implemented all methods in `CategoryController` for required endpoints
+- All endpoints return JSON responses and proper error handling
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -119,6 +146,7 @@
 ### Controllers
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`

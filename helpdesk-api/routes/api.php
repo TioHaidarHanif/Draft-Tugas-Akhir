@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json([
             'status' => 'success',
             'message' => 'User dashboard',
-            'data' => ['user_role' => auth()->user()->role]
+            'data' => ['user_role' => Auth::user() ? Auth::user()->role : null]
         ]);
     });
     
@@ -44,7 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json([
                 'status' => 'success',
                 'message' => 'Admin dashboard',
-                'data' => ['user_role' => auth()->user()->role]
+                'data' => ['user_role' => Auth::user() ? Auth::user()->role : null]
             ]);
         });
         // User Management Endpoints
@@ -54,6 +56,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/users/{id}', [UserController::class, 'update']);
         Route::patch('/users/{id}/role', [UserController::class, 'updateRole']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
+        
+        // Category & SubCategory Management Endpoints
+        Route::post('/categories', [CategoryController::class, 'store']);
+        Route::post('/categories/{category}/sub-categories', [CategoryController::class, 'storeSubCategory']);
     });
     
     // Routes accessible by admin or disposisi users
@@ -62,8 +68,11 @@ Route::middleware('auth:sanctum')->group(function () {
             return response()->json([
                 'status' => 'success',
                 'message' => 'Staff dashboard',
-                'data' => ['user_role' => auth()->user()->role]
+                'data' => ['user_role' => Auth::user() ? Auth::user()->role : null]
             ]);
         });
     });
+    
+    // Category & SubCategory Management Endpoints (accessible by all authenticated users)
+    Route::get('/categories', [CategoryController::class, 'index']);
 });
