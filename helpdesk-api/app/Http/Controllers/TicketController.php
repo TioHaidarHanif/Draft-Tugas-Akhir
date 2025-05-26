@@ -8,6 +8,7 @@ use App\Models\TicketAttachment;
 use App\Models\TicketFeedback;
 use App\Models\TicketHistory;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,23 @@ use Illuminate\Support\Facades\Validator;
 
 class TicketController extends Controller
 {
+    /**
+     * The notification service instance.
+     *
+     * @var NotificationService
+     */
+    protected $notificationService;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param NotificationService $notificationService
+     * @return void
+     */
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
     /**
      * Create a new ticket
      * 
@@ -106,15 +124,7 @@ class TicketController extends Controller
             $history->save();
             
             // Create notification for admin users
-            $this->createTicketNotification(
-                null, // recipient_id (null for role-based)
-                'admin', // recipient_role
-                $user->id, // sender_id
-                $ticket->id, // ticket_id
-                'Tiket Baru', // title
-                "Tiket baru telah dibuat: {$ticket->judul}", // message
-                'new_ticket' // type
-            );
+            $this->notificationService->createNewTicketNotification($ticket);
             
             // Commit transaction
             DB::commit();
@@ -333,7 +343,7 @@ class TicketController extends Controller
             }
             
             // Create notifications based on who changed the status
-            $this->createStatusChangeNotifications($ticket, $user, $oldStatus, $newStatus);
+            $this->notificationService->createStatusChangeNotification($ticket, $oldStatus, $newStatus, $user->id);
             
             // Reset read flags for other roles
             $this->resetTicketReadFlags($ticket, $user->role);
@@ -431,15 +441,7 @@ class TicketController extends Controller
             $history->save();
             
             // Create notification for assigned user
-            $this->createTicketNotification(
-                $assignedUser->id, // recipient_id
-                'disposisi', // recipient_role
-                $user->id, // sender_id
-                $ticket->id, // ticket_id
-                'Tiket Didisposisikan', // title
-                "Tiket telah didisposisikan kepada Anda: {$ticket->judul}", // message
-                'assignment' // type
-            );
+            $this->notificationService->createAssignmentNotification($ticket, $user->id, $assignedUser->id);
             
             // Update read flags
             $ticket->read_by_admin = true;
@@ -578,7 +580,7 @@ class TicketController extends Controller
             $feedback->save();
             
             // Create notifications based on the feedback sender
-            $this->createFeedbackNotifications($ticket, $user, $feedback);
+            $this->notificationService->createFeedbackNotification($ticket, $user->id);
             
             // Reset read flags for other roles
             $this->resetTicketReadFlags($ticket, $user->role);
@@ -821,48 +823,6 @@ class TicketController extends Controller
                     $message,
                     'feedback'
                 );
-            }
-        }
-    }
-    
-    /**
-     * Create a notification
-     * 
-     * @param string|null $recipientId
-     * @param string $recipientRole
-     * @param string $senderId
-     * @param string $ticketId
-     * @param string $title
-     * @param string $message
-     * @param string $type
-     * @return void
-     */
-    private function createTicketNotification($recipientId, $recipientRole, $senderId, $ticketId, $title, $message, $type)
-    {
-        if ($recipientId) {
-            // Create notification for specific user
-            $notification = new Notification();
-            $notification->recipient_id = $recipientId;
-            $notification->recipient_role = $recipientRole;
-            $notification->sender_id = $senderId;
-            $notification->ticket_id = $ticketId;
-            $notification->title = $title;
-            $notification->message = $message;
-            $notification->type = $type;
-            $notification->save();
-        } else {
-            // Create notifications for all users with specific role
-            $users = User::where('role', $recipientRole)->get();
-            foreach ($users as $recipient) {
-                $notification = new Notification();
-                $notification->recipient_id = $recipient->id;
-                $notification->recipient_role = $recipientRole;
-                $notification->sender_id = $senderId;
-                $notification->ticket_id = $ticketId;
-                $notification->title = $title;
-                $notification->message = $message;
-                $notification->type = $type;
-                $notification->save();
             }
         }
     }

@@ -50,6 +50,44 @@
 #### Middleware Created
 - Created `CheckRole` middleware for role-based authorization
 
+### Notification Management (May 26, 2025)
+
+#### Controllers Created
+- Implemented `NotificationController` with full CRUD operations
+  - GET /notifications for retrieving user notifications with filtering options
+  - PATCH /notifications/{id}/read for marking a specific notification as read
+  - PATCH /notifications/read-all for marking all notifications as read
+  - POST /notifications for creating notifications manually
+
+#### Services Created
+- Implemented `NotificationService` for centralized notification handling
+  - `createNewTicketNotification` for notifying admins about new tickets
+  - `createAssignmentNotification` for notifying disposisi members about assigned tickets
+  - `createStatusChangeNotification` for notifying relevant users about status changes
+  - `createFeedbackNotification` for notifying users about new feedback
+
+#### Integration with Existing Features
+- Integrated notification generation into TicketController actions
+  - Automatic notifications when tickets are created
+  - Automatic notifications when tickets are assigned
+  - Automatic notifications when ticket status is updated
+  - Automatic notifications when feedback is added
+
+#### Routes Created
+- Added notification routes for all notification operations
+
+#### Features Implemented
+- Manual notification creation with support for:
+  - Individual recipient (recipient_id)
+  - Role-based recipients (recipient_role)
+  - Different notification types (new_ticket, assignment, status_change, feedback, custom)
+- Notification filtering by read status and type
+- Proper validation and authorization checks
+
+#### Tests Created
+- Created `NotificationControllerTest` for testing notification creation and validation
+- Created `NotificationServiceTest` for testing automatic notification generation
+
 ### Ticket Management (May 24, 2025)
 
 #### Controllers Created
