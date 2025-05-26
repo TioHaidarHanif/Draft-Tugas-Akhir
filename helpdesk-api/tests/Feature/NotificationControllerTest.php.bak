@@ -10,6 +10,14 @@ use Tests\TestCase;
 class NotificationControllerTest extends TestCase
 {
     use RefreshDatabase;
+    
+    /**
+     * Helper method to log response content
+     */
+    private function logResponse($response)
+    {
+        fwrite(STDERR, "Response: " . json_encode($response->json(), JSON_PRETTY_PRINT) . "\n");
+    }
 
     /**
      * Test creating a notification.
@@ -232,6 +240,34 @@ class NotificationControllerTest extends TestCase
                 ]
             ]);
     }
+        
+        // Verify all returned notifications are read
+        $notifications = $response->json('data.notifications');
+        if (is_array($notifications) && !empty($notifications)) {
+            foreach ($notifications as $notification) {
+                $this->assertNotNull($notification['read_at']);
+            }
+        }
+        
+        // Test filtering for unread notifications
+        $response = $this->getJson('/api/notifications?read=false');
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'notifications',
+                    'pagination'
+                ]
+            ]);
+        
+        // Verify all returned notifications are unread
+        $notifications = $response->json('data.notifications');
+        if (is_array($notifications) && !empty($notifications)) {
+            foreach ($notifications as $notification) {
+                $this->assertNull($notification['read_at']);
+            }
+        }
+    }
     
     /**
      * Test filtering notifications by type.
@@ -240,6 +276,9 @@ class NotificationControllerTest extends TestCase
      */
     public function test_can_filter_notifications_by_type()
     {
+        // Clear any existing notifications
+        Notification::query()->delete();
+        
         // Create a user
         $user = User::factory()->create(['role' => 'student']);
         
@@ -274,6 +313,14 @@ class NotificationControllerTest extends TestCase
                         'pagination'
                     ]
                 ]);
+            
+            // Verify all returned notifications are of the requested type
+            $notifications = $response->json('data.notifications');
+            if (is_array($notifications) && !empty($notifications)) {
+                foreach ($notifications as $notification) {
+                    $this->assertEquals($type, $notification['type']);
+                }
+            }
         }
     }
     
@@ -314,10 +361,8 @@ class NotificationControllerTest extends TestCase
         // Verify notification is now marked as read in the database
         $this->assertDatabaseHas('notifications', [
             'id' => $notification->id,
+            'read_at' => now()->startOfSecond()->toDateTimeString(),
         ]);
-        
-        // Verify read_at is not null
-        $this->assertNotNull(Notification::find($notification->id)->read_at);
     }
     
     /**

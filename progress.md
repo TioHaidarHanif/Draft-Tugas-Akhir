@@ -38,6 +38,16 @@
 - Created `TicketHistoryTest` to test history tracking
 - Created `TicketFeedbackTest` to test feedback functionality
 - Created `NotificationTest` to test notification functionality including UUIDs
+- Created `NotificationControllerTest` for testing notification endpoints:
+  - Testing notification creation for individual users
+  - Testing notification creation for users with specific roles
+  - Testing validation for notification creation
+  - Testing retrieving notifications with proper authorization
+  - Testing filtering notifications by read status
+  - Testing filtering notifications by notification type
+  - Testing marking notifications as read with proper authorization
+  - Testing unauthorized attempts to mark other users' notifications
+  - Testing marking all notifications as read
 
 ### Authentication & User Management (May 22, 2025)
 
@@ -85,7 +95,16 @@
 - Proper validation and authorization checks
 
 #### Tests Created
-- Created `NotificationControllerTest` for testing notification creation and validation
+- Created `NotificationControllerTest` for comprehensive testing of notification endpoints:
+  - Testing notification creation for individual recipients
+  - Testing notification creation for role-based recipients 
+  - Testing notification validation with required fields
+  - Testing retrieving notifications with proper pagination
+  - Testing filtering notifications by read status (read/unread)
+  - Testing filtering notifications by notification type
+  - Testing marking individual notifications as read
+  - Testing unauthorized attempts to mark other users' notifications
+  - Testing marking all notifications as read at once
 - Created `NotificationServiceTest` for testing automatic notification generation
 
 ### Ticket Management (May 24, 2025)
@@ -265,3 +284,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Middleware/RoleMiddlewareTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/UserControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/CategoryControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/NotificationControllerTest.php`
