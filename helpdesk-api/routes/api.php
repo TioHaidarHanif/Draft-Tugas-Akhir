@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -87,4 +88,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tickets/{id}/feedback', [TicketController::class, 'addFeedback']);
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
     Route::post('/tickets/{id}/restore', [TicketController::class, 'restore']);
+    
+    // Notification Management Endpoints (all authenticated users)
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
 });

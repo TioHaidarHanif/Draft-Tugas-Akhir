@@ -102,7 +102,7 @@
 - Implemented all methods in `CategoryController` for required endpoints
 - All endpoints return JSON responses and proper error handling
 
-## [Tanggal: 2025-05-24] Implementasi Fitur Manajemen Ticket
+### [Tanggal: 2025-05-24] Implementasi Fitur Manajemen Ticket
 
 - Menambahkan endpoint manajemen ticket (POST, GET, PATCH, DELETE, RESTORE) di TicketController.
 - Implementasi validasi input menggunakan FormRequest (StoreTicketRequest, UpdateTicketStatusRequest, AssignTicketRequest, AddTicketFeedbackRequest, TicketListFilterRequest).
@@ -110,6 +110,21 @@
 - Menambah relasi model Ticket: attachment, histories, feedbacks.
 - Menambah feature test untuk TicketController (create, list, assign, update status, soft delete, restore).
 - Semua endpoint sudah membatasi akses berbasis role sesuai kebutuhan.
+
+### [Notifikasi] Implementasi Fitur Manajemen Notifikasi
+
+- Menambah NotificationController dengan endpoint:
+  - GET /notifications (daftar notifikasi, filter read/type)
+  - PATCH /notifications/{id}/read (tandai notifikasi dibaca)
+  - PATCH /notifications/read-all (tandai semua notifikasi dibaca)
+  - POST /notifications (buat notifikasi manual)
+- Menambah validasi input StoreNotificationRequest
+- Menambah event & listener untuk notifikasi otomatis (new_ticket, assignment, status_change, feedback)
+- Menambah NotificationFactory untuk keperluan testing
+- Menambah NotificationTest (feature test)
+- Registrasi event-listener di EventServiceProvider
+- Semua endpoint menggunakan otorisasi berbasis user login
+- Response dan struktur sesuai api.md
 
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
@@ -157,6 +172,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/TicketController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/NotificationController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -177,3 +193,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Middleware/RoleMiddlewareTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/UserManagementTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Ticket/TicketControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Notification/NotificationControllerTest.php`
