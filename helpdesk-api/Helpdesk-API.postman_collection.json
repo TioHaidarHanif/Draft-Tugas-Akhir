@@ -1,0 +1,769 @@
+{
+  "info": {
+    "_postman_id": "helpdesk-api-collection-2025",
+    "name": "Helpdesk API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Dokumentasi lengkap seluruh endpoint API Helpdesk. Gunakan variable {{base_url}} untuk base URL. Semua request menggunakan header Accept: application/json. Tambahkan Authorization: Bearer {{token}} untuk endpoint yang membutuhkan autentikasi."
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost/api" },
+    { "key": "token", "value": "" },
+    { "key": "user_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get All Users (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [ { \"id\": 1, \"name\": \"Admin\", \"email\": \"admin@example.com\", ... } ]\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {},
+              "status": "Forbidden",
+              "code": 403,
+              "body": "{\n  \"message\": \"This action is unauthorized.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Detail (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/users/{{user_id}}", "host": ["{{base_url}}"], "path": ["users", "{{user_id}}"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": { \"id\": 2, \"name\": \"User\", ... }\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {},
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"User not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User (Admin Only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users/{{user_id}}", "host": ["{{base_url}}"], "path": ["users", "{{user_id}}"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": { \"id\": 2, \"name\": \"Updated Name\", ... }\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {},
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"User not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User Role (Admin Only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"disposisi\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/users/{{user_id}}/role", "host": ["{{base_url}}"], "path": ["users", "{{user_id}}", "role"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": { \"id\": 2, \"role\": \"disposisi\", ... }\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {},
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"User not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete User (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/users/{{user_id}}", "host": ["{{base_url}}"], "path": ["users", "{{user_id}}"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"User deleted successfully\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {},
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"User not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Statistics (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/users/statistics", "host": ["{{base_url}}"], "path": ["users", "statistics"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {},
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": { \"total\": 10, \"by_role\": { \"admin\": 2, \"student\": 8 } }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ticket Management",
+      "item": [
+        {
+          "name": "Create Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "judul", "value": "Test Ticket", "type": "text" },
+                { "key": "deskripsi", "value": "Deskripsi keluhan", "type": "text" },
+                { "key": "category_id", "value": "1", "type": "text" },
+                { "key": "sub_category_id", "value": "1", "type": "text" },
+                { "key": "prodi", "value": "Informatika", "type": "text" },
+                { "key": "semester", "value": "6", "type": "text" },
+                { "key": "no_hp", "value": "08123456789", "type": "text" },
+                { "key": "anonymous", "value": "false", "type": "text" },
+                { "key": "lampiran", "type": "file" }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/tickets", "host": ["{{base_url}}"], "path": ["tickets"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if(json.data && json.data.id){ pm.collectionVariables.set('ticket_id', json.data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Ticket created successfully\",\n  \"data\": { \"id\": 10, ... }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": { ... }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tickets?status=&category_id=&sub_category_id=&search=&startDate=&endDate=&sortBy=&sortOrder=&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["tickets"],
+              "query": [
+                { "key": "status", "value": "", "description": "Filter by status (optional)" },
+                { "key": "category_id", "value": "", "description": "Filter by category (optional)" },
+                { "key": "sub_category_id", "value": "", "description": "Filter by sub-category (optional)" },
+                { "key": "search", "value": "", "description": "Search by title/description (optional)" },
+                { "key": "startDate", "value": "", "description": "Start date (optional)" },
+                { "key": "endDate", "value": "", "description": "End date (optional)" },
+                { "key": "sortBy", "value": "", "description": "Sort by field (optional)" },
+                { "key": "sortOrder", "value": "", "description": "Sort order (asc/desc, optional)" },
+                { "key": "per_page", "value": "10", "description": "Items per page (optional)" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"tickets\": [ { \"id\": 10, ... } ],\n    \"pagination\": { ... }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Ticket Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/tickets/{{ticket_id}}", "host": ["{{base_url}}"], "path": ["tickets", "{{ticket_id}}"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": { \"ticket\": { \"id\": 10, ... } }\n}"
+            },
+            {
+              "name": "Forbidden",
+              "status": "Forbidden",
+              "code": 403,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Forbidden\",\n  \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Ticket Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/tickets/{{ticket_id}}/status", "host": ["{{base_url}}"], "path": ["tickets", "{{ticket_id}}", "status"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Ticket status updated successfully\",\n  \"data\": { \"id\": 10, \"status\": \"resolved\", ... }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Assign Ticket (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assigned_to\": 3\n}"
+            },
+            "url": { "raw": "{{base_url}}/tickets/{{ticket_id}}/assign", "host": ["{{base_url}}"], "path": ["tickets", "{{ticket_id}}", "assign"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Ticket assigned successfully\",\n  \"data\": { \"id\": 10, \"assigned_to\": 3, ... }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Ticket Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Feedback untuk tiket\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/tickets/{{ticket_id}}/feedback", "host": ["{{base_url}}"], "path": ["tickets", "{{ticket_id}}", "feedback"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Feedback added successfully\",\n  \"data\": { ... }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Ticket",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/tickets/{{ticket_id}}", "host": ["{{base_url}}"], "path": ["tickets", "{{ticket_id}}"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Ticket has been soft deleted\",\n  \"data\": { \"id\": 10, \"deleted_at\": \"2025-05-27T10:00:00Z\" }\n}"
+            },
+            {
+              "name": "Forbidden",
+              "status": "Forbidden",
+              "code": 403,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Forbidden\",\n  \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Restore Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/tickets/{{ticket_id}}/restore", "host": ["{{base_url}}"], "path": ["tickets", "{{ticket_id}}", "restore"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Ticket has been restored\",\n  \"data\": { \"id\": 10, \"deleted_at\": null }\n}"
+            },
+            {
+              "name": "Forbidden",
+              "status": "Forbidden",
+              "code": 403,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Forbidden\",\n  \"code\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ticket Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/tickets/statistics", "host": ["{{base_url}}"], "path": ["tickets", "statistics"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"total\": 5,\n    \"new\": 1,\n    \"in_progress\": 2,\n    \"resolved\": 1,\n    \"closed\": 1,\n    \"unread\": 0,\n    \"by_category\": [ { \"category_id\": 1, \"category_name\": \"Akademik\", \"count\": 3 } ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notification Management",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications?read=&type=&per_page=10",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"],
+              "query": [
+                { "key": "read", "value": "", "description": "Filter by read status (optional)" },
+                { "key": "type", "value": "", "description": "Filter by type (optional)" },
+                { "key": "per_page", "value": "10", "description": "Items per page (optional)" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"notifications\": [ { \"id\": 1, ... } ],\n    \"pagination\": { ... }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/notifications/{{notification_id}}/read", "host": ["{{base_url}}"], "path": ["notifications", "{{notification_id}}", "read"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if(json.data && json.data.id){ pm.collectionVariables.set('notification_id', json.data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Notification marked as read\",\n  \"data\": { \"id\": 1, \"read_at\": \"2025-05-27T10:00:00Z\" }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/notifications/read-all", "host": ["{{base_url}}"], "path": ["notifications", "read-all"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"All notifications marked as read\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Notification (Manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipient_id\": 2,\n  \"recipientRole\": \"admin\",\n  \"title\": \"Manual\",\n  \"message\": \"Manual notification\",\n  \"type\": \"custom\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/notifications", "host": ["{{base_url}}"], "path": ["notifications"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Notification created successfully\",\n  \"data\": { ... }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Category Management",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/categories", "host": ["{{base_url}}"], "path": ["categories"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"categories\": [ { \"id\": 1, \"name\": \"Akademik\", \"sub_categories\": [ { \"id\": 1, \"name\": \"KRS\" } ] } ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Category (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Akademik\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories", "host": ["{{base_url}}"], "path": ["categories"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if(json.data && json.data.id){ pm.collectionVariables.set('category_id', json.data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Category created successfully\",\n  \"data\": { \"id\": 1, \"name\": \"Akademik\" }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": { ... },\n  \"code\": 422\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Sub-Category (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"KRS\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/categories/{{category_id}}/sub-categories", "host": ["{{base_url}}"], "path": ["categories", "{{category_id}}", "sub-categories"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if(json.data && json.data.id){ pm.collectionVariables.set('sub_category_id', json.data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Success",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Sub-category created successfully\",\n  \"data\": { \"id\": 1, \"category_id\": 1, \"name\": \"KRS\" }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": { ... },\n  \"code\": 422\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"User Name\",\n  \"email\": \"user@example.com\",\n  \"password\": \"password\",\n  \"password_confirmation\": \"password\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Registration successful\",\n  \"data\": { \"user\": { ... }, \"token\": \"...\" }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "body": "{\n  \"message\": \"The given data was invalid.\",\n  \"errors\": { ... }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if(json.data && json.data.token){ pm.collectionVariables.set('token', json.data.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Login successful\",\n  \"data\": { \"user\": { ... }, \"token\": \"...\" }\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"message\": \"Invalid credentials\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/logout", "host": ["{{base_url}}"], "path": ["auth", "logout"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Logout successful\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/profile", "host": ["{{base_url}}"], "path": ["auth", "profile"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": { \"id\": 1, \"name\": \"User Name\", ... }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
