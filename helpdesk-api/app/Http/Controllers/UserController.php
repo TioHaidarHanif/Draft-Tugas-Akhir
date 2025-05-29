@@ -12,13 +12,23 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     /**
-     * Display a listing of users.
+     * Display a listing of users with ticket statistics.
      * 
      * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::withCount('tickets')->get();
+        
+        // Add ticket statistics to each user
+        $users->each(function ($user) {
+            $user->tickets_statistics = [
+                'total' => $user->tickets_count,
+                'open' => $user->tickets()->where('status', 'open')->count(),
+                'closed' => $user->tickets()->where('status', 'closed')->count(),
+                'in_progress' => $user->tickets()->where('status', 'in_progress')->count(),
+            ];
+        });
         
         return response()->json([
             'status' => 'success',
@@ -28,14 +38,17 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified user.
+     * Display the specified user with ticket details.
      * 
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::with(['tickets' => function ($query) {
+            $query->select('id', 'user_id', 'judul', 'status', 'created_at')
+                  ->latest();
+        }])->find($id);
         
         if (!$user) {
             return response()->json([
@@ -44,6 +57,20 @@ class UserController extends Controller
                 'code' => 404
             ], 404);
         }
+        
+        // Add URL to each ticket
+        $user->tickets->transform(function ($ticket) {
+            $ticket->url = url("/api/tickets/{$ticket->id}");
+            return $ticket;
+        });
+        
+        // Add ticket statistics to the user data
+        $user->tickets_statistics = [
+            'total' => $user->tickets->count(),
+            'open' => $user->tickets->where('status', 'open')->count(),
+            'closed' => $user->tickets->where('status', 'closed')->count(),
+            'in_progress' => $user->tickets->where('status', 'in_progress')->count(),
+        ];
         
         return response()->json([
             'status' => 'success',

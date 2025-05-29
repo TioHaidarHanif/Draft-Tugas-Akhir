@@ -172,18 +172,22 @@
 5. Set up appropriate foreign key constraints to maintain referential integrity
 6. Designed database schema to support both authenticated and anonymous ticket submissions
 
-### User Management (May 23, 2025)
+### User Management (May 23, 2025 - Updated May 29, 2025)
 
 #### Controllers Enhanced
 - Enhanced `UserController` with complete CRUD operations for user management
   - Implemented endpoints for listing, viewing, updating, and deleting users
   - Added role management functionality
   - Created user statistics endpoint for admin dashboard
+  - Added ticket statistics and ticket lists to user endpoints (May 29, 2025)
+    - GET `/users` now includes per-user ticket statistics (total, open, closed, in_progress)
+    - GET `/users/{id}` now includes detailed ticket list and statistics for the specific user
+    - Added URL field to each ticket in the response, pointing to `/tickets/{id}` endpoint
 
 #### Routes Added
 - Added user management routes (admin only)
-  - GET `/users` to retrieve all users
-  - GET `/users/{id}` to retrieve a specific user
+  - GET `/users` to retrieve all users with ticket statistics
+  - GET `/users/{id}` to retrieve a specific user with ticket statistics and ticket list
   - PATCH `/users/{id}` to update user information
   - PATCH `/users/{id}/role` to update user role
   - DELETE `/users/{id}` to delete a user
@@ -195,6 +199,9 @@
   - Tests for role management
   - Tests for user statistics
   - Tests for authorization (ensuring only admins can access)
+  - Tests for retrieving users with ticket statistics and ticket lists (May 29, 2025)
+    - Test for retrieving all users with ticket statistics
+    - Test for retrieving a specific user with detailed ticket information
 
 ### Category & SubCategory Management (May 23, 2025)
 

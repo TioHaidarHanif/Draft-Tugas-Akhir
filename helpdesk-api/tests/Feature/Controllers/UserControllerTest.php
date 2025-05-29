@@ -9,16 +9,28 @@ use Tests\TestCase;
 class UserControllerTest extends TestCase
 {
     /**
-     * Test admin can get list of all users.
+     * Test admin can get list of all users with ticket statistics.
      *
      * @return void
      */
-    public function test_admin_can_get_all_users()
+    public function test_admin_can_get_all_users_with_ticket_statistics()
     {
         $admin = $this->createAndAuthenticateUser('admin');
         
         // Create some additional users
-        User::factory()->count(3)->create();
+        $users = User::factory()->count(3)->create();
+        
+        // Create tickets for a user
+        $user = $users[0];
+        \App\Models\Ticket::factory()->count(2)->create([
+            'user_id' => $user->id,
+            'status' => 'open'
+        ]);
+        
+        \App\Models\Ticket::factory()->count(1)->create([
+            'user_id' => $user->id,
+            'status' => 'closed'
+        ]);
         
         $response = $this->getJson('/api/users');
         
@@ -26,8 +38,30 @@ class UserControllerTest extends TestCase
                  ->assertJsonStructure([
                      'status',
                      'message',
-                     'data'
+                     'data' => [
+                         '*' => [
+                             'id',
+                             'name',
+                             'email',
+                             'role',
+                             'tickets_count',
+                             'tickets_statistics' => [
+                                 'total',
+                                 'open',
+                                 'closed',
+                                 'in_progress'
+                             ]
+                         ]
+                     ]
                  ]);
+        
+        // Assert the user with tickets has the correct statistics
+        $responseData = $response->json('data');
+        $responseUser = collect($responseData)->firstWhere('id', $user->id);
+        
+        $this->assertEquals(3, $responseUser['tickets_statistics']['total']);
+        $this->assertEquals(2, $responseUser['tickets_statistics']['open']);
+        $this->assertEquals(1, $responseUser['tickets_statistics']['closed']);
     }
     
     /**
@@ -59,15 +93,28 @@ class UserControllerTest extends TestCase
     }
     
     /**
-     * Test admin can get a specific user.
+     * Test admin can get a specific user with ticket details.
      *
      * @return void
      */
-    public function test_admin_can_get_specific_user()
+    public function test_admin_can_get_specific_user_with_ticket_details()
     {
         $admin = $this->createAndAuthenticateUser('admin');
         
         $user = User::factory()->create();
+        
+        // Create some tickets for the user
+        \App\Models\Ticket::factory()->count(2)->create([
+            'user_id' => $user->id,
+            'status' => 'open',
+            'judul' => 'Test Ticket Open'
+        ]);
+        
+        \App\Models\Ticket::factory()->count(1)->create([
+            'user_id' => $user->id,
+            'status' => 'closed',
+            'judul' => 'Test Ticket Closed'
+        ]);
         
         $response = $this->getJson("/api/users/{$user->id}");
         
@@ -79,9 +126,38 @@ class UserControllerTest extends TestCase
                          'id',
                          'name',
                          'email',
-                         'role'
+                         'role',
+                         'tickets' => [
+                             '*' => [
+                                 'id',
+                                 'judul',
+                                 'status',
+                                 'created_at',
+                                 'url'
+                             ]
+                         ],
+                         'tickets_statistics' => [
+                             'total',
+                             'open',
+                             'closed',
+                             'in_progress'
+                         ]
                      ]
                  ]);
+        
+        // Assert ticket statistics are correct
+        $responseData = $response->json('data');
+        $this->assertEquals(3, $responseData['tickets_statistics']['total']);
+        $this->assertEquals(2, $responseData['tickets_statistics']['open']);
+        $this->assertEquals(1, $responseData['tickets_statistics']['closed']);
+        
+        // Assert tickets are included in the response
+        $this->assertCount(3, $responseData['tickets']);
+        
+        // Assert each ticket has a URL
+        foreach ($responseData['tickets'] as $ticket) {
+            $this->assertStringContainsString("/api/tickets/{$ticket['id']}", $ticket['url']);
+        }
     }
     
     /**
