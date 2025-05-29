@@ -11,6 +11,9 @@ class UserManagementTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $admin;
+    protected $user;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -69,5 +72,54 @@ class UserManagementTest extends TestCase
         $response = $this->actingAs($this->admin)->getJson('/api/users/statistics');
         $response->assertStatus(200)
             ->assertJsonStructure(['status', 'data' => ['total', 'by_role']]);
+    }
+
+    public function test_user_list_includes_ticket_statistics_and_list()
+    {
+        $user = $this->user;
+        $ticket1 = \App\Models\Ticket::factory()->create([
+            'user_id' => $user->id,
+            'judul' => 'Ticket Satu',
+            'status' => 'open',
+        ]);
+        $ticket2 = \App\Models\Ticket::factory()->create([
+            'user_id' => $user->id,
+            'judul' => 'Ticket Dua',
+            'status' => 'closed',
+        ]);
+        $response = $this->actingAs($this->admin)->getJson('/api/users');
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    ['id', 'name', 'email', 'role', 'created_at', 'updated_at', 'ticket_count', 'tickets'],
+                ]
+            ]);
+        $userData = collect($response->json('data'))->firstWhere('id', $user->id);
+        $this->assertEquals(2, $userData['ticket_count']);
+        $this->assertCount(2, $userData['tickets']);
+        $this->assertEquals('Ticket Satu', $userData['tickets'][0]['judul']);
+    }
+
+    public function test_user_detail_includes_ticket_statistics_and_list()
+    {
+        $user = $this->user;
+        $ticket = \App\Models\Ticket::factory()->create([
+            'user_id' => $user->id,
+            'judul' => 'Ticket Detail',
+            'status' => 'open',
+        ]);
+        $response = $this->actingAs($this->admin)->getJson('/api/users/' . $user->id);
+        print_r($response->json());
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'id', 'name', 'email', 'role', 'created_at', 'updated_at', 'ticket_count', 'tickets'
+                ]
+            ]);
+        $data = $response->json('data');
+        $this->assertEquals(1, $data['ticket_count']);
+        $this->assertEquals('Ticket Detail', $data['tickets'][0]['judul']);
     }
 }

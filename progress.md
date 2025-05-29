@@ -126,6 +126,12 @@
 - Semua endpoint menggunakan otorisasi berbasis user login
 - Response dan struktur sesuai api.md
 
+### User Management Enhancement (May 29, 2025)
+
+- Menambahkan statistik jumlah ticket dan daftar ticket (id, judul, status) pada response endpoint GET /users dan GET /users/{id}
+- Optimasi query dengan eager loading relasi tickets untuk menghindari N+1 problem
+- Menambahkan dan memperbaiki feature test untuk memastikan statistik dan daftar ticket muncul pada response user
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features

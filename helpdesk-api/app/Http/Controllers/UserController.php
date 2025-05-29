@@ -12,26 +12,64 @@ class UserController extends Controller
     // GET /users
     public function index()
     {
-        $users = User::all();
+        // Eager load tickets untuk menghindari N+1
+        $users = User::with(['tickets:id,user_id,judul,status'])->get();
+        $data = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+                // Statistik jumlah ticket
+                'ticket_count' => $user->tickets->count(),
+                // Daftar ticket (id, judul, status)
+                'tickets' => $user->tickets->map(function ($ticket) {
+                    return [
+                        'id' => $ticket->id,
+                        'judul' => $ticket->judul,
+                        'status' => $ticket->status,
+                    ];
+                }),
+            ];
+        });
         return response()->json([
             'status' => 'success',
-            'data' => $users
+            'data' => $data
         ]);
     }
 
     // GET /users/{id}
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::with(['tickets:id,user_id,judul,status'])->find($id);
         if (!$user) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'User not found'
             ], 404);
         }
+        $data = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+            'ticket_count' => $user->tickets->count(),
+            'tickets' => $user->tickets->map(function ($ticket) {
+                return [
+                    'id' => $ticket->id,
+                    'judul' => $ticket->judul,
+                    'status' => $ticket->status,
+                    'url' => '/tickets/' . $ticket->id,
+                ];
+            }),
+        ];
         return response()->json([
             'status' => 'success',
-            'data' => $user
+            'data' => $data
         ]);
     }
 
