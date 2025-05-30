@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
@@ -123,4 +124,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::post('/notifications', [NotificationController::class, 'store']);
+    
+    // Chat Routes
+    Route::get('/tickets/{id}/chat', [ChatController::class, 'index']);
+    Route::post('/tickets/{id}/chat', [ChatController::class, 'store']);
+    Route::delete('/tickets/{id}/chat/{message_id}', [ChatController::class, 'destroy']);
+    Route::post('/tickets/{id}/chat/attachment', [ChatController::class, 'uploadAttachment']);
+    Route::get('/tickets/{id}/chat/attachments', [ChatController::class, 'getAttachments']);
 });

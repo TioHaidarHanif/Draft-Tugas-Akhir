@@ -110,6 +110,14 @@ class Ticket extends Model
     }
 
     /**
+     * Get the chat messages for the ticket.
+     */
+    public function chatMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class);
+    }
+
+    /**
      * Get the notifications related to the ticket.
      */
     public function notifications(): HasMany

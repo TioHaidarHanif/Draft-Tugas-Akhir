@@ -234,6 +234,73 @@
   - Tests for validation (ensuring unique names)
   - Tests for authorization (ensuring only admins can modify categories)
 
+### Chat Management (May 30, 2025)
+
+#### Migrations Created
+- Created `chat_messages` table with:
+  - References to ticket_id and user_id
+  - Message content field
+  - Read by tracking (JSON array)
+  - Soft deletes for message retention
+- Created `chat_attachments` table with:
+  - References to chat_message_id
+  - File details (name, path, type, size)
+  - Storage references for file retrieval
+
+#### Models Created
+- Created `ChatMessage` model with relationships:
+  - Belongs to Ticket and User
+  - Has many ChatAttachments
+  - Includes read status tracking
+- Created `ChatAttachment` model:
+  - Belongs to ChatMessage
+  - Includes file handling functionality
+- Updated `Ticket` model:
+  - Added relationship to ChatMessages
+
+#### Services Created
+- Implemented `ChatService` for centralized chat handling:
+  - Methods for creating chat notifications
+  - Methods for managing read status
+  - System message creation functionality
+
+#### Controllers Created
+- Created `ChatController` with comprehensive CRUD operations:
+  - `index()` for retrieving chat messages with pagination
+  - `store()` for creating new chat messages
+  - `destroy()` for deleting chat messages
+  - `uploadAttachment()` for handling file uploads
+  - `getAttachments()` for retrieving all attachments for a ticket
+
+#### Role-Based Authorization
+- Implemented proper authorization in ChatController:
+  - Users can only access chats for tickets they're involved with
+  - Admin and disposisi users have access based on ticket assignment
+  - Read status is tracked per user
+
+#### Routes Created
+- Added chat management routes:
+  - GET `/tickets/{id}/chat` for retrieving chat messages
+  - POST `/tickets/{id}/chat` for creating new chat messages
+  - DELETE `/tickets/{id}/chat/{message_id}` for deleting messages
+  - POST `/tickets/{id}/chat/attachment` for uploading attachments
+  - GET `/tickets/{id}/chat/attachments` for retrieving attachments
+
+#### Tests Created
+- Created `ChatMessageTest` for testing the ChatMessage model:
+  - Tests for relationships with Ticket, User, and ChatAttachments
+  - Tests for CRUD operations and soft deletes
+  - Tests for read status tracking
+- Created `ChatAttachmentTest` for testing the ChatAttachment model:
+  - Tests for relationship with ChatMessage
+  - Tests for file handling functionality
+- Created `ChatControllerTest` for testing chat endpoints:
+  - Tests for retrieving messages with proper authorization
+  - Tests for creating messages with notifications
+  - Tests for deleting messages with proper authorization
+  - Tests for file upload and retrieval
+  - Tests for unauthorized access attempts
+
 ### Next Steps
 1. Create ticket management API endpoints
 2. Implement ticket feedback and history tracking
@@ -251,6 +318,8 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000015_create_ticket_histories_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000016_create_ticket_feedbacks_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000017_create_notifications_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_124547_0001_01_01_000018_create_chat_messages_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_124555_0001_01_01_000019_create_chat_attachments_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
@@ -261,6 +330,8 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/TicketHistory.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/TicketFeedback.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/Notification.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatMessage.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatAttachment.php`
 
 ### Seeders
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/seeders/RoleSeeder.php`
@@ -271,12 +342,13 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/Auth/AuthController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
 
 ### Routes
-- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/routes/api.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/routes/api.php` (modified)
 
 ### Tests
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/UserTest.php`
@@ -292,3 +364,6 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/UserControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Controllers/CategoryControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/NotificationControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Models/ChatMessageTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Models/ChatAttachmentTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Controllers/ChatControllerTest.php`
