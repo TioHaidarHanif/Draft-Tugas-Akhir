@@ -110,7 +110,6 @@ class UserManagementTest extends TestCase
             'status' => 'open',
         ]);
         $response = $this->actingAs($this->admin)->getJson('/api/users/' . $user->id);
-        print_r($response->json());
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'status',

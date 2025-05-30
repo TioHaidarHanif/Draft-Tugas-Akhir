@@ -132,6 +132,22 @@
 - Optimasi query dengan eager loading relasi tickets untuk menghindari N+1 problem
 - Menambahkan dan memperbaiki feature test untuk memastikan statistik dan daftar ticket muncul pada response user
 
+### [2025-05-30] Implementasi Fitur Manajemen Chat
+
+- Menambahkan migrasi chat_messages dan chat_attachments
+- Membuat model ChatMessage dan ChatAttachment beserta relasi
+- Membuat ChatController untuk endpoint:
+  - GET /tickets/{id}/chat
+  - POST /tickets/{id}/chat
+  - POST /tickets/{id}/chat/attachment
+  - DELETE /tickets/{id}/chat/{message_id}
+  - GET /tickets/{id}/chat/attachments
+- Menambahkan otorisasi agar hanya user terkait ticket yang dapat mengakses chat
+- Integrasi notifikasi NewChatMessageNotification ke sistem notifikasi
+- Menambah route API untuk chat
+- Membuat feature test ChatControllerTest untuk seluruh endpoint chat
+- Mendokumentasikan perubahan di progress.md
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -157,6 +173,8 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000015_create_ticket_histories_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000016_create_ticket_feedbacks_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000017_create_notifications_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000018_create_chat_messages_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000019_create_chat_attachments_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
@@ -167,6 +185,8 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/TicketHistory.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/TicketFeedback.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/Notification.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatMessage.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatAttachment.php`
 
 ### Seeders
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/seeders/RoleSeeder.php`
@@ -179,6 +199,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/TicketController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/NotificationController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -200,3 +221,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Auth/UserManagementTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Ticket/TicketControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Notification/NotificationControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Chat/ChatControllerTest.php`

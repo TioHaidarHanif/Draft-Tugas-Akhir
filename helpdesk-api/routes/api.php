@@ -94,4 +94,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::post('/notifications', [NotificationController::class, 'store']);
+    
+    // Chat Management Endpoints (for ticket discussions)
+    Route::get('/tickets/{id}/chat', [\App\Http\Controllers\ChatController::class, 'index']);
+    Route::post('/tickets/{id}/chat', [\App\Http\Controllers\ChatController::class, 'store']);
+    Route::post('/tickets/{id}/chat/attachment', [\App\Http\Controllers\ChatController::class, 'uploadAttachment']);
+    Route::delete('/tickets/{id}/chat/{message_id}', [\App\Http\Controllers\ChatController::class, 'destroy']);
+    Route::get('/tickets/{id}/chat/attachments', [\App\Http\Controllers\ChatController::class, 'attachments']);
 });

@@ -124,4 +124,12 @@ class Ticket extends Model
     {
         return $this->hasMany(Notification::class);
     }
+
+    /**
+     * Get the chat messages for the ticket.
+     */
+    public function chatMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'ticket_id', 'id');
+    }
 }
