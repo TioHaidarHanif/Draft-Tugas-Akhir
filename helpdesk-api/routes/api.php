@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\FAQController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -101,4 +102,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tickets/{id}/chat/attachment', [\App\Http\Controllers\ChatController::class, 'uploadAttachment']);
     Route::delete('/tickets/{id}/chat/{message_id}', [\App\Http\Controllers\ChatController::class, 'destroy']);
     Route::get('/tickets/{id}/chat/attachments', [\App\Http\Controllers\ChatController::class, 'attachments']);
+});
+
+// FAQ Public Endpoints
+Route::get('/faqs', [FAQController::class, 'index']);
+Route::get('/faqs/categories', [FAQController::class, 'categories']);
+Route::get('/faqs/{id}', [FAQController::class, 'show']);
+
+// FAQ Admin Endpoints
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::post('/faqs', [FAQController::class, 'store']);
+    Route::patch('/faqs/{id}', [FAQController::class, 'update']);
+    Route::delete('/faqs/{id}', [FAQController::class, 'destroy']);
+    Route::post('/tickets/{id}/convert-to-faq', [FAQController::class, 'convertFromTicket']);
 });

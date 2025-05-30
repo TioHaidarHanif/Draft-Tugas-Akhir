@@ -148,6 +148,17 @@
 - Membuat feature test ChatControllerTest untuk seluruh endpoint chat
 - Mendokumentasikan perubahan di progress.md
 
+### [2025-05-30] Implementasi Fitur Manajemen FAQ
+
+- Menambahkan migrasi `faqs` untuk menyimpan pertanyaan dan jawaban FAQ, relasi ke kategori, user pembuat, dan ticket asal (opsional)
+- Membuat model `Faq` beserta relasi ke `Category`, `User`, dan `Ticket`
+- Membuat `FAQController` untuk operasi CRUD FAQ, konversi ticket ke FAQ, dan pengambilan kategori FAQ
+- Menambahkan endpoint publik: GET /faqs, GET /faqs/{id}, GET /faqs/categories
+- Menambahkan endpoint admin: POST /faqs, PATCH /faqs/{id}, DELETE /faqs/{id}, POST /tickets/{id}/convert-to-faq
+- Menggunakan middleware otorisasi agar hanya admin yang dapat mengelola FAQ
+- Membuat feature test FAQControllerTest untuk memastikan seluruh endpoint dan otorisasi berjalan sesuai kebutuhan
+- Mendokumentasikan seluruh perubahan di progress.md
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -175,6 +186,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000017_create_notifications_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000018_create_chat_messages_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000019_create_chat_attachments_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000020_create_faqs_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
@@ -187,6 +199,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/Notification.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatMessage.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatAttachment.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/Faq.php`
 
 ### Seeders
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/seeders/RoleSeeder.php`
@@ -200,6 +213,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/TicketController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/NotificationController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/FaqController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -222,3 +236,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Ticket/TicketControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Notification/NotificationControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Chat/ChatControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Faq/FaqControllerTest.php`
