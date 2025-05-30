@@ -81,4 +81,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class, 'recipient_id');
     }
+    
+    /**
+     * Get the FAQs created by this user.
+     */
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(FAQ::class);
+    }
 }

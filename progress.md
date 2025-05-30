@@ -13,6 +13,7 @@
 - Created `ticket_histories` table
 - Created `ticket_feedbacks` table
 - Created `notifications` table with UUID
+- Created `faqs` table with UUID and soft deletes (May 30, 2025)
 
 #### Models Created
 - Enhanced `User` model with relationships
@@ -23,6 +24,7 @@
 - Created `TicketHistory` model
 - Created `TicketFeedback` model
 - Created `Notification` model with UUID
+- Created `FAQ` model with soft deletes and UUID (May 30, 2025)
 
 #### Seeders Created
 - Created `RoleSeeder` for default user roles (admin, disposisi, user)
@@ -301,6 +303,65 @@
   - Tests for file upload and retrieval
   - Tests for unauthorized access attempts
 
+### FAQ Management (May 30, 2025)
+
+#### Migrations Created
+- Created `faqs` table with:
+  - UUID primary key for enhanced security
+  - Question and answer fields
+  - References to category_id and user_id
+  - Optional reference to ticket_id for converted tickets
+  - Public/private status flag
+  - View count for tracking popularity
+  - Soft deletes for content retention
+
+#### Models Created
+- Created `FAQ` model with relationships and features:
+  - Belongs to Category and User
+  - Optional belongs to Ticket (for converted tickets)
+  - HasUuids and SoftDeletes traits
+  - View count increment functionality
+  - Public/private visibility control
+
+#### Controllers Created
+- Created `FAQController` with comprehensive CRUD operations:
+  - `index()` for listing FAQs with filtering and search
+  - `show()` for viewing FAQ details with view count tracking
+  - `store()` for creating new FAQs (admin only)
+  - `update()` for updating existing FAQs (admin only)
+  - `destroy()` for soft-deleting FAQs (admin only)
+  - `convertTicketToFAQ()` for converting tickets to FAQs (admin only)
+  - `categories()` for retrieving FAQ categories with counts
+
+#### Role-Based Authorization
+- Implemented role-based access control for FAQ operations:
+  - Public endpoints accessible by all users (including guests)
+  - Management endpoints restricted to admin users only
+  - Private FAQs visible only to admin users
+
+#### Routes Created
+- Added public FAQ routes (no authentication required):
+  - GET `/faqs` for listing all public FAQs with filtering
+  - GET `/faqs/{id}` for viewing FAQ details
+  - GET `/faqs/categories` for retrieving FAQ categories
+- Added protected FAQ routes (admin only):
+  - POST `/faqs` for creating new FAQs
+  - PATCH `/faqs/{id}` for updating FAQs
+  - DELETE `/faqs/{id}` for soft-deleting FAQs
+  - POST `/tickets/{id}/convert-to-faq` for converting tickets to FAQs
+
+#### Tests Created
+- Created `FAQTest` for testing the FAQ model:
+  - Tests for CRUD operations and soft deletes
+  - Tests for relationships with Category, User, and Ticket
+  - Tests for view count functionality
+- Created `FAQControllerTest` for testing FAQ endpoints:
+  - Tests for listing FAQs with filtering and search
+  - Tests for viewing FAQ details with proper authorization
+  - Tests for creating, updating, and deleting FAQs with role-based restrictions
+  - Tests for converting tickets to FAQs
+  - Tests for FAQ categories endpoint
+
 ### Next Steps
 1. Create ticket management API endpoints
 2. Implement ticket feedback and history tracking
@@ -320,6 +381,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000017_create_notifications_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_124547_0001_01_01_000018_create_chat_messages_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_124555_0001_01_01_000019_create_chat_attachments_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_143055_0001_01_01_000020_create_faqs_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
@@ -332,6 +394,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/Notification.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatMessage.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatAttachment.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/FAQ.php`
 
 ### Seeders
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/seeders/RoleSeeder.php`
@@ -343,6 +406,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/UserController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/FAQController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -367,3 +431,5 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Models/ChatMessageTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Models/ChatAttachmentTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Controllers/ChatControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Models/FAQTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Controllers/FAQControllerTest.php`

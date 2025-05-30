@@ -34,4 +34,12 @@ class Category extends Model
     {
         return $this->hasMany(Ticket::class);
     }
+    
+    /**
+     * Get the FAQs in this category.
+     */
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(FAQ::class);
+    }
 }

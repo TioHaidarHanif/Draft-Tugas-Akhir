@@ -124,4 +124,12 @@ class Ticket extends Model
     {
         return $this->hasMany(Notification::class);
     }
+    
+    /**
+     * Get the FAQ that was created from this ticket.
+     */
+    public function faq()
+    {
+        return $this->hasOne(FAQ::class);
+    }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\FAQController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
@@ -22,6 +23,11 @@ use Illuminate\Support\Facades\Route;
 // Public Routes - No Authentication Required
 // This ensures the categories index route is outside any auth middleware
 Route::get('/categories', [CategoryController::class, 'index']);
+
+// FAQ Public Routes
+Route::get('/faqs/categories', [FAQController::class, 'categories']);
+Route::get('/faqs', [FAQController::class, 'index']);
+Route::get('/faqs/{id}', [FAQController::class, 'show']);
 
 // Authentication Routes
 Route::prefix('auth')->group(function () {
@@ -131,4 +137,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/tickets/{id}/chat/{message_id}', [ChatController::class, 'destroy']);
     Route::post('/tickets/{id}/chat/attachment', [ChatController::class, 'uploadAttachment']);
     Route::get('/tickets/{id}/chat/attachments', [ChatController::class, 'getAttachments']);
+    
+    // FAQ Management Routes (Admin only)
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/faqs', [FAQController::class, 'store']);
+        Route::patch('/faqs/{id}', [FAQController::class, 'update']);
+        Route::delete('/faqs/{id}', [FAQController::class, 'destroy']);
+        Route::post('/tickets/{id}/convert-to-faq', [FAQController::class, 'convertTicketToFAQ']);
+    });
 });
