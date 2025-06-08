@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\FAQController;
+use App\Http\Controllers\EmailController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -115,4 +116,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::patch('/faqs/{id}', [FAQController::class, 'update']);
     Route::delete('/faqs/{id}', [FAQController::class, 'destroy']);
     Route::post('/tickets/{id}/convert-to-faq', [FAQController::class, 'convertFromTicket']);
+});
+
+// Email Manual Endpoints (admin only)
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::post('/emails/send', [EmailController::class, 'send']);
+    Route::get('/emails/logs', [EmailController::class, 'logs']);
 });

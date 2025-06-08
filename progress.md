@@ -159,6 +159,21 @@
 - Membuat feature test FAQControllerTest untuk memastikan seluruh endpoint dan otorisasi berjalan sesuai kebutuhan
 - Mendokumentasikan seluruh perubahan di progress.md
 
+### Fitur Kirim Email Manual (8 Juni 2025)
+
+- Menambahkan template view email di `resources/views/emails/manual.blade.php`
+- Konfigurasi SMTP Gmail pada `.env` dan `config/mail.php`
+- Menambahkan migrasi `email_logs` untuk log pengiriman email
+- Membuat model `EmailLog` dan factory-nya
+- Membuat controller `EmailController` untuk endpoint:
+  - `POST /emails/send` (hanya admin)
+  - `GET /emails/logs` (hanya admin)
+- Menambahkan validasi input (email, subject, body wajib dan valid)
+- Implementasi otorisasi admin pada endpoint terkait
+- Membuat Mailable `ManualMail` untuk pengiriman email manual
+- Menambahkan unit test dan feature test untuk pengiriman email manual dan log
+- Semua pengujian lulus
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -187,6 +202,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000018_create_chat_messages_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000019_create_chat_attachments_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000020_create_faqs_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000021_create_email_logs_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
@@ -200,6 +216,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatMessage.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatAttachment.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/Faq.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/EmailLog.php`
 
 ### Seeders
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/seeders/RoleSeeder.php`
@@ -214,6 +231,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/NotificationController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/FaqController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/EmailController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -237,3 +255,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Notification/NotificationControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Chat/ChatControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Faq/FaqControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Email/EmailControllerTest.php`

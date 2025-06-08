@@ -35,15 +35,25 @@ class UserFactory extends Factory
 
     public function asUser(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'role' => 'student',
-        ]);
+        // Dihapus, tidak ada role 'user'
+        return $this;
     }
 
     public function asAdmin(): static
     {
         return $this->state(fn (array $attributes) => [
             'role' => 'admin',
+        ]);
+    }
+    public function asHelpdesk(): static
+    {
+        // Dihapus, tidak ada role 'helpdesk'
+        return $this;
+    }
+    public function asDisposisi(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'disposisi',
         ]);
     }
 
