@@ -362,6 +362,47 @@
   - Tests for converting tickets to FAQs
   - Tests for FAQ categories endpoint
 
+### Email System Implementation (June 8, 2025)
+
+#### Email Features Completed
+- Implemented manual email sending feature (admin only)
+- Created email template view
+- Configured SMTP for email delivery with Gmail as default
+- Added email logs for tracking and reporting
+
+#### Database Changes
+- Created `email_logs` table with the following fields:
+  - user_id (foreign key to users table)
+  - to_email (recipient email address)
+  - subject (email subject)
+  - content (email body content)
+  - status (sent/failed)
+  - error_message (if sending failed)
+  - timestamps and soft deletes
+
+#### Models Added
+- Created `EmailLog` model with relationships to User model
+
+#### Controllers Added
+- Created `EmailController` with methods:
+  - `send()` - For sending manual emails with validation
+  - `logs()` - For retrieving email sending logs (admin only)
+
+#### Mail Classes Added
+- Created `ManualEmail` mailable for sending custom emails
+
+#### Routes Added
+- Added email management routes (admin only):
+  - POST `/api/emails/send` - For sending manual emails
+  - GET `/api/emails/logs` - For retrieving email logs
+
+#### Tests Added
+- Created `EmailControllerTest` to test email functionality:
+  - Testing email sending with admin authorization
+  - Testing authorization for non-admin users
+  - Testing email validation
+  - Testing email logs retrieval with proper authorization
+
 ### Next Steps
 1. Create ticket management API endpoints
 2. Implement ticket feedback and history tracking
@@ -382,6 +423,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_124547_0001_01_01_000018_create_chat_messages_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_124555_0001_01_01_000019_create_chat_attachments_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_143055_0001_01_01_000020_create_faqs_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_06_08_141157_create_email_logs_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
@@ -395,6 +437,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatMessage.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatAttachment.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/FAQ.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/EmailLog.php`
 
 ### Seeders
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/seeders/RoleSeeder.php`
@@ -407,6 +450,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/CategoryController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/FAQController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/EmailController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -433,3 +477,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Controllers/ChatControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Models/FAQTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Controllers/FAQControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/EmailControllerTest.php`

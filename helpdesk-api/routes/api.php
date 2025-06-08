@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TicketController;
@@ -144,5 +145,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/faqs/{id}', [FAQController::class, 'update']);
         Route::delete('/faqs/{id}', [FAQController::class, 'destroy']);
         Route::post('/tickets/{id}/convert-to-faq', [FAQController::class, 'convertTicketToFAQ']);
+        
+        // Email Management Routes (Admin only)
+        Route::post('/emails/send', [EmailController::class, 'send']);
+        Route::get('/emails/logs', [EmailController::class, 'logs']);
     });
 });
