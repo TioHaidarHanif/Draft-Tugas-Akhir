@@ -90,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tickets/{id}/feedback', [TicketController::class, 'addFeedback']);
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
     Route::post('/tickets/{id}/restore', [TicketController::class, 'restore']);
+    Route::post('/tickets/{id}/reveal-token', [TicketController::class, 'revealToken']);
     
     // Notification Management Endpoints (all authenticated users)
     Route::get('/notifications', [NotificationController::class, 'index']);

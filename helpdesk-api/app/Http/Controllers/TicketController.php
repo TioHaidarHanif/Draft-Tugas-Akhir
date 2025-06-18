@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTicketStatusRequest;
 use App\Http\Requests\AssignTicketRequest;
 use App\Http\Requests\AddTicketFeedbackRequest;
 use App\Http\Requests\TicketListFilterRequest;
+use App\Http\Requests\RevealTicketTokenRequest;
 use App\Models\Ticket;
 use App\Models\TicketHistory;
 use App\Models\TicketFeedback;
@@ -67,7 +68,10 @@ class TicketController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket created successfully',
-                'data' => $ticket->load('attachments'),
+                'data' => array_merge(
+                    $ticket->load('attachments')->toArray(),
+                    $ticket->anonymous ? ['token' => $ticket->token] : []
+                ),
             ], 201);
         });
     }
@@ -118,12 +122,24 @@ class TicketController extends Controller
     {
         $ticket = Ticket::with(['attachment', 'histories', 'feedbacks'])->findOrFail($id);
         $user = Auth::user();
+        $includeToken = false;
+        if ($user->role === 'admin') {
+            $includeToken = true;
+        } elseif ($ticket->anonymous && $ticket->user_id === $user->id && request('reveal_token') == 1) {
+            $includeToken = true;
+        }
+        $ticketArr = $ticket->toArray();
+        if ($includeToken) {
+            $ticketArr['token'] = $ticket->token;
+        } else {
+            unset($ticketArr['token']);
+        }
         if ($user->role === 'student' && $ticket->user_id !== $user->id) {
             return response()->json(['status' => 'error', 'message' => 'Forbidden', 'code' => 403], 403);
         }
         return response()->json([
             'status' => 'success',
-            'data' => [ 'ticket' => $ticket ]
+            'data' => [ 'ticket' => $ticketArr ]
         ]);
     }
 
@@ -351,6 +367,28 @@ class TicketController extends Controller
             'data' => [
                 'id' => $ticket->id,
                 'deleted_at' => null
+            ]
+        ]);
+    }
+
+    // POST /tickets/{id}/reveal-token
+    public function revealToken(RevealTicketTokenRequest $request, $id)
+    {
+        $ticket = Ticket::findOrFail($id);
+        $user = $request->user();
+        // Hanya user pembuat ticket anonymous yang boleh akses
+        if (!$ticket->anonymous || $ticket->user_id !== $user->id) {
+            return response()->json(['status' => 'error', 'message' => 'Forbidden', 'code' => 403], 403);
+        }
+        // Rate limiting (opsional, bisa pakai throttle middleware di route)
+        // Verifikasi password
+        if (!\Illuminate\Support\Facades\Hash::check($request->input('password'), $user->password)) {
+            return response()->json(['status' => 'error', 'message' => 'Password salah', 'code' => 401], 401);
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'token' => $ticket->token
             ]
         ]);
     }

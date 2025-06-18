@@ -174,6 +174,22 @@
 - Menambahkan unit test dan feature test untuk pengiriman email manual dan log
 - Semua pengujian lulus
 
+### [2025-06-18] Fitur Token Rahasia untuk Ticket Anonymous
+
+- Menambah migrasi kolom `token` (string, unique, nullable) pada tabel `tickets`.
+- Modifikasi model Ticket: auto-generate token saat ticket anonymous dibuat, validasi token, dan relasi tetap berjalan.
+- Membuat service helper `TicketTokenService` untuk generate token yang unik, secure, dan user-friendly.
+- Modifikasi TicketController:
+  - Auto-generate token pada POST /tickets jika anonymous.
+  - Response ticket anonymous menyertakan token hanya untuk user pembuat.
+  - Endpoint baru POST /tickets/{id}/reveal-token untuk reveal token dengan password verification.
+  - Modifikasi GET /tickets/{id} agar token hanya tampil untuk admin atau user pembuat yang sudah verifikasi.
+- Membuat FormRequest `RevealTicketTokenRequest` untuk validasi password.
+- Menambah route baru untuk endpoint reveal-token.
+- Menambah feature test TicketTokenTest untuk seluruh skenario (auto-generate, reveal, otorisasi, validasi password, admin access).
+- Semua test relevan lulus.
+- Dokumentasi dan progress.md diperbarui.
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -256,3 +272,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Chat/ChatControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Faq/FaqControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Email/EmailControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/TicketTokenTest.php`

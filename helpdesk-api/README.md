@@ -59,3 +59,35 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Fitur: Token Rahasia untuk Ticket Anonymous
+
+Fitur ini memungkinkan setiap ticket anonymous memiliki token rahasia yang hanya dapat diakses oleh user pembuat (dengan verifikasi password) atau admin.
+
+### Cara Kerja
+- Saat membuat ticket anonymous (`anonymous=true`), sistem otomatis membuat token unik dan mudah diingat.
+- Token hanya dikembalikan pada response create ticket untuk user pembuat.
+- Untuk melihat token setelah pembuatan, gunakan endpoint:
+  - `POST /tickets/{id}/reveal-token` dengan body `{ "password": "..." }` (wajib login sebagai pembuat ticket)
+  - Jika password benar, response akan mengembalikan token.
+- Admin selalu dapat melihat token pada detail ticket.
+- User lain tidak dapat mengakses token ticket anonymous milik orang lain.
+
+### Keamanan
+- Token unik dan tidak mudah ditebak.
+- Validasi password menggunakan hash Laravel.
+- Rate limiting dapat diaktifkan pada endpoint reveal-token.
+- Token hanya dikembalikan pada response jika user berhak.
+
+### Testing
+- Terdapat feature test untuk seluruh skenario utama (lihat `tests/Feature/Tickets/TicketTokenTest.php`).
+
+### Migrasi
+- Jalankan `php artisan migrate` untuk menambah kolom token pada tabel tickets.
+
+### Kode Terkait
+- Model: `app/Models/Ticket.php`
+- Service: `app/Services/TicketTokenService.php`
+- Controller: `app/Http/Controllers/TicketController.php`
+- FormRequest: `app/Http/Requests/RevealTicketTokenRequest.php`
+- Route: `routes/api.php`

@@ -1,6 +1,6 @@
 <?php
 
-dnamespace Tests\Unit;
+namespace Tests\Unit;
 
 use App\Mail\ManualMail;
 use Illuminate\Support\Facades\Mail;

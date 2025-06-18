@@ -36,6 +36,7 @@ class Ticket extends Model
         'read_by_admin',
         'read_by_disposisi',
         'read_by_student',
+        'token', // tambahkan token agar mass assignable
     ];
 
     /**
@@ -131,5 +132,23 @@ class Ticket extends Model
     public function chatMessages()
     {
         return $this->hasMany(ChatMessage::class, 'ticket_id', 'id');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($ticket) {
+            if ($ticket->anonymous && empty($ticket->token)) {
+                // Gunakan helper untuk generate token
+                $ticket->token = app(\App\Services\TicketTokenService::class)->generateToken();
+            }
+        });
+    }
+
+    /**
+     * Validasi token (opsional, bisa dikembangkan lebih lanjut)
+     */
+    public function validateToken($token)
+    {
+        return hash_equals($this->token, $token);
     }
 }
