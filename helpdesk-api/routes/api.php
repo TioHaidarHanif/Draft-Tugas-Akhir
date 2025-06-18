@@ -108,6 +108,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Get ticket details (authorization checked in controller)
     Route::get('/tickets/{id}', [TicketController::class, 'show']);
     
+    // Reveal token for anonymous ticket (password verification in controller)
+    Route::post('/tickets/{id}/reveal-token', [TicketController::class, 'revealToken']);
+    
     // Update ticket status (authorization checked in controller)
     Route::patch('/tickets/{id}/status', [TicketController::class, 'updateStatus']);
     

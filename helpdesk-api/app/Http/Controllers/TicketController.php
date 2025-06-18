@@ -12,6 +12,7 @@ use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -75,6 +76,11 @@ class TicketController extends Controller
             $ticket = new Ticket();
             $ticket->user_id = $user->id;
             $ticket->anonymous = $request->boolean('anonymous', false);
+            
+            // Generate token for anonymous tickets
+            if ($ticket->anonymous) {
+                $ticket->generateToken();
+            }
             
             // Set personal information
             $ticket->nim = $request->input('nim');
@@ -694,6 +700,89 @@ class TicketController extends Controller
     }
     
     /**
+     * Reveal the token for an anonymous ticket after password verification
+     * 
+     * @param Request $request
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function revealToken(Request $request, $id)
+    {
+        // Validate request data
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+                'code' => 422
+            ], 422);
+        }
+
+        // Get the ticket
+        $ticket = Ticket::findOrFail($id);
+        
+        // Check if the ticket is anonymous and has a token
+        if (!$ticket->anonymous || empty($ticket->token)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token is only available for anonymous tickets',
+                'code' => 400
+            ], 400);
+        }
+        
+        // Get current authenticated user
+        $user = Auth::user();
+        
+        // If admin, allow access without password verification
+        if ($user->role === 'admin') {
+            // Store in session that token has been revealed
+            session(['revealed_token_' . $ticket->id => true]);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Token revealed successfully',
+                'data' => [
+                    'token' => $ticket->token
+                ]
+            ]);
+        }
+        
+        // Verify if this is the ticket creator by checking user_id
+        if ($ticket->user_id !== $user->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You are not authorized to view this ticket token',
+                'code' => 403
+            ], 403);
+        }
+        
+        // Verify password
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid password',
+                'code' => 401
+            ], 401);
+        }
+        
+        // Password verified, reveal token
+        // Store in session that token has been revealed
+        session(['revealed_token_' . $ticket->id => true]);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Token revealed successfully',
+            'data' => [
+                'token' => $ticket->token
+            ]
+        ]);
+    }
+    
+    /**
      * Create notifications for status changes
      * 
      * @param Ticket $ticket
@@ -928,6 +1017,12 @@ class TicketController extends Controller
             'created_at' => $ticket->created_at,
             'updated_at' => $ticket->updated_at
         ];
+        
+        // Include token for admin users or if token has been revealed
+        $user = Auth::user();
+        if ($ticket->anonymous && $ticket->token && ($user->role === 'admin' || session('revealed_token_' . $ticket->id))) {
+            $response['token'] = $ticket->token;
+        }
         
         // Include attachments if available
         if ($ticket->relationLoaded('attachments') && $ticket->attachments->count() > 0) {

@@ -21,6 +21,7 @@ class Ticket extends Model
     protected $fillable = [
         'user_id',
         'anonymous',
+        'token',
         'judul',
         'deskripsi',
         'category_id',
@@ -52,6 +53,20 @@ class Ticket extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+    
+    /**
+     * Generate a unique token for the ticket
+     * Only for anonymous tickets
+     * 
+     * @return void
+     */
+    public function generateToken()
+    {
+        if ($this->anonymous && empty($this->token)) {
+            $tokenService = app(\App\Services\TokenService::class);
+            $this->token = $tokenService->generateToken();
+        }
+    }
 
     /**
      * Get the user that created the ticket.

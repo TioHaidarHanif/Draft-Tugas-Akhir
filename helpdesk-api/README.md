@@ -59,3 +59,66 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+# Helpdesk Ticketing API
+
+## Features
+
+### User Management
+- Authentication with JWT
+- Role-based authorization (admin, disposisi, student)
+- User registration and profile management
+
+### Ticket Management
+- Create, read, update, and delete tickets
+- Assign tickets to staff members
+- Track ticket status changes
+- Add feedback to tickets
+- Support for anonymous tickets
+- Token-based verification for anonymous tickets
+
+### Categories and Subcategories
+- Hierarchical organization of ticket types
+- Flexible category management
+
+### Notifications
+- Real-time notifications for ticket updates
+- Email notifications for important events
+
+### Chat System
+- Real-time chat between users and support staff
+- Support for file attachments in chat
+
+### FAQ Management
+- Create and manage FAQ entries
+- Convert resolved tickets to FAQ entries
+
+## Token Rahasia Feature
+
+The system includes a feature for anonymous ticket verification:
+
+- Each anonymous ticket receives a unique token in format `XXXX-XXXX-XXXX`
+- Tokens are automatically generated when creating anonymous tickets
+- Users can reveal their token using their account password
+- Admin users can see all tokens without verification
+- Tokens can be used to verify ownership of anonymous tickets
+
+For more details, see the [Token Feature Documentation](docs/token-feature.md).
+
+## API Documentation
+
+The API endpoints are documented in the Postman collection included in the repository.
+
+## Installation
+
+1. Clone the repository
+2. Run `composer install`
+3. Copy `.env.example` to `.env` and configure your database
+4. Run `php artisan key:generate`
+5. Run `php artisan migrate`
+6. Run `php artisan db:seed` to populate with initial data
+7. Run `php artisan serve` to start the development server
+
+## Testing
+
+Run `php artisan test` to execute the test suite

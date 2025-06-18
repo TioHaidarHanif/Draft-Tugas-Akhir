@@ -403,6 +403,20 @@
   - Testing email validation
   - Testing email logs retrieval with proper authorization
 
+### Token Rahasia untuk Ticket Anonymous (June 18, 2025)
+
+#### Implemented Features
+- Added `token` column to `tickets` table
+- Created `TokenService` for generating secure, user-friendly tokens
+- Modified `Ticket` model to auto-generate tokens for anonymous tickets
+- Added token to ticket response for admin users and verified users
+- Created new endpoint `POST /tickets/{id}/reveal-token` for password verification
+- Added comprehensive unit tests for the token feature
+- Created documentation for the token feature
+
+#### Migration
+- Added `2025_06_18_010903_add_token_to_tickets_table` migration
+
 ### Next Steps
 1. Create ticket management API endpoints
 2. Implement ticket feedback and history tracking
@@ -424,6 +438,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_124555_0001_01_01_000019_create_chat_attachments_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_05_30_143055_0001_01_01_000020_create_faqs_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_06_08_141157_create_email_logs_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/2025_06_18_010903_add_token_to_tickets_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
