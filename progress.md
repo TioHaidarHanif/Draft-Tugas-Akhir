@@ -493,3 +493,124 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Models/FAQTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Feature/Controllers/FAQControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/EmailControllerTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/TicketChatInfoTest.php`
+
+## Informasi Jumlah Chat dan Status Chat Terbaca pada Ticket (Juni 22, 2025)
+
+### Ringkasan Perubahan
+
+Implementasi fitur untuk menampilkan informasi jumlah chat dan status chat yang belum terbaca pada endpoint `/tickets`. Fitur ini memperkaya data ticket dengan menambahkan:
+
+1. `chat_count`: Jumlah total pesan chat pada ticket
+2. `has_unread_chat`: Status apakah terdapat chat yang belum dibaca oleh user yang sedang login
+
+### Perubahan Kode
+
+#### 1. Model Ticket
+
+Penambahan accessor methods pada model `Ticket` untuk menghitung jumlah chat dan mendeteksi chat yang belum terbaca:
+
+```php
+/**
+ * Count the number of chat messages for the ticket.
+ * 
+ * @return int
+ */
+public function getChatCountAttribute(): int
+{
+    return $this->chatMessages()->count();
+}
+
+/**
+ * Check if there are unread chat messages for the current user.
+ * 
+ * @return bool
+ */
+public function getHasUnreadChatAttribute(): bool
+{
+    if (!auth()->check()) {
+        return false;
+    }
+    
+    $userId = auth()->id();
+    
+    return $this->chatMessages()
+        ->where(function ($query) use ($userId) {
+            $query->whereJsonDoesntContain('read_by', $userId)
+                  ->orWhereNull('read_by');
+        })
+        ->exists();
+}
+```
+
+#### 2. Resource Classes
+
+Pembuatan resource classes untuk standarisasi format respons API:
+
+- `TicketResource`: Resource umum untuk data ticket
+- `TicketDetailResource`: Resource untuk detail ticket (extends `TicketResource`)
+
+Resource classes ini secara otomatis memasukkan field `chat_count` dan `has_unread_chat` ke dalam respons API.
+
+#### 3. Controller
+
+Modifikasi `TicketController` untuk:
+
+- Mengganti penggunaan function formatters dengan resource classes
+- Menggunakan eager loading dengan optimasi query untuk chat count
+- Menambahkan subquery untuk deteksi chat yang belum terbaca
+
+Contoh optimasi query:
+
+#### Penerapan Best Practices
+
+1. **Accessor Methods untuk Data Derivatif**: Menggunakan accessor methods untuk menghitung `chat_count` dan `has_unread_chat` daripada menyimpannya sebagai kolom database.
+
+2. **Penggunaan Laravel Resource**: Menggunakan Laravel API Resource untuk standarisasi dan transformasi data.
+
+3. **Penggunaan Query Builder**: Mengganti raw SQL queries dengan query builder Laravel yang lebih aman:
+
+```php
+// Sebelum
+->whereRaw("NOT JSON_CONTAINS(read_by, ?)", ["$userId"])
+
+// Sesudah
+->where(function ($query) use ($userId) {
+    $query->whereJsonDoesntContain('read_by', $userId)
+          ->orWhereNull('read_by');
+})
+```
+
+4. **Optimasi Performa**: Menggunakan `withCount()` untuk menghitung chat tanpa query tambahan.
+
+5. **Testing yang Terisolasi**: Unit test dan feature test yang tidak bergantung pada implementasi detail.
+
+#### 4. Tests
+
+Implementasi tests untuk validasi fitur:
+
+- `test_ticket_listing_includes_chat_count`: Memastikan listing ticket menampilkan jumlah chat
+- `test_ticket_detail_includes_chat_count`: Memastikan detail ticket menampilkan jumlah chat
+- `test_reading_messages_updates_unread_status`: Memastikan status terbaca berubah setelah pesan dibaca
+
+### Keuntungan Implementasi
+
+1. **Peningkatan UX**: User dapat langsung melihat ada tidaknya chat baru tanpa harus membuka ticket
+2. **Optimasi Query**: Menggunakan subquery dan eager loading untuk menghindari N+1 problem
+3. **Standarisasi Response**: Menggunakan Laravel Resource untuk format respons yang konsisten
+4. **Testable**: Dilengkapi dengan tests untuk memastikan reliability
+
+### Pengujian
+
+Feature dapat diuji dengan:
+
+1. Melihat daftar ticket (`GET /api/tickets`) - pastikan field `chat_count` dan `has_unread_chat` tampil
+2. Melihat detail ticket (`GET /api/tickets/{id}`) - pastikan field tersebut tampil dengan nilai yang benar
+3. Mengirim chat baru dan memastikan nilai `has_unread_chat` berubah untuk user lain
+4. Membaca chat dan memastikan nilai `has_unread_chat` berubah menjadi `false`
+
+### Next Steps
+
+1. Frontend dapat menampilkan badge atau indikator untuk ticket dengan chat yang belum terbaca
+2. Menambahkan fitur notifikasi real-time untuk chat baru
+3. Implementasi fitur "mark all as read" untuk chat

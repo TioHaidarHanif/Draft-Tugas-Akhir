@@ -131,6 +131,37 @@ class Ticket extends Model
     {
         return $this->hasMany(ChatMessage::class);
     }
+    
+    /**
+     * Count the number of chat messages for the ticket.
+     * 
+     * @return int
+     */
+    public function getChatCountAttribute(): int
+    {
+        return $this->chatMessages()->count();
+    }
+    
+    /**
+     * Check if there are unread chat messages for the current user.
+     * 
+     * @return bool
+     */
+    public function getHasUnreadChatAttribute(): bool
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+        
+        $userId = auth()->id();
+        
+        return $this->chatMessages()
+            ->where(function ($query) use ($userId) {
+                $query->whereJsonDoesntContain('read_by', $userId)
+                      ->orWhereNull('read_by');
+            })
+            ->exists();
+    }
 
     /**
      * Get the notifications related to the ticket.

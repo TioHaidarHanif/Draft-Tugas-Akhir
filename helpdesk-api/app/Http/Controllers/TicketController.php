@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TicketDetailResource;
+use App\Http\Resources\TicketResource;
+use App\Models\ChatMessage;
 use App\Models\Notification;
 use App\Models\Ticket;
 use App\Models\TicketAttachment;
 use App\Models\TicketFeedback;
 use App\Models\TicketHistory;
 use App\Models\User;
+use App\Services\ChatService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,14 +30,23 @@ class TicketController extends Controller
     protected $notificationService;
 
     /**
+     * The chat service instance.
+     *
+     * @var ChatService
+     */
+    protected $chatService;
+
+    /**
      * Create a new controller instance.
      *
      * @param NotificationService $notificationService
+     * @param ChatService $chatService
      * @return void
      */
-    public function __construct(NotificationService $notificationService)
+    public function __construct(NotificationService $notificationService, ChatService $chatService)
     {
         $this->notificationService = $notificationService;
+        $this->chatService = $chatService;
     }
     /**
      * Create a new ticket
@@ -139,7 +152,7 @@ class TicketController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket created successfully',
-                'data' => $this->formatTicketResponse($ticket)
+                'data' => new TicketResource($ticket)
             ], 201);
             
         } catch (\Exception $e) {
@@ -218,19 +231,17 @@ class TicketController extends Controller
         // Include relationships
         $query->with(['category', 'subCategory', 'attachments']);
         
+        // Use withCount to efficiently count chat messages using a subquery
+        $query->withCount('chatMessages as chat_count');
+        
         // Paginate results
         $perPage = $request->input('per_page', 10);
         $tickets = $query->paginate($perPage);
         
-        // Format response
-        $formattedTickets = $tickets->map(function ($ticket) {
-            return $this->formatTicketResponse($ticket);
-        });
-        
         return response()->json([
             'status' => 'success',
             'data' => [
-                'tickets' => $formattedTickets,
+                'tickets' => TicketResource::collection($tickets),
                 'pagination' => [
                     'total' => $tickets->total(),
                     'per_page' => $tickets->perPage(),
@@ -251,8 +262,9 @@ class TicketController extends Controller
     {
         $user = Auth::user();
         $ticket = Ticket::with(['category', 'subCategory', 'attachments', 'histories', 'feedbacks'])
+            ->withCount('chatMessages as chat_count')
             ->findOrFail($id);
-        
+            
         // Check authorization
         if (!$this->authorizeTicketAccess($ticket, $user)) {
             return response()->json([
@@ -268,7 +280,7 @@ class TicketController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'ticket' => $this->formatTicketDetailResponse($ticket)
+                'ticket' => new TicketDetailResource($ticket)
             ]
         ]);
     }
@@ -359,19 +371,7 @@ class TicketController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket status updated successfully',
-                'data' => [
-                    'id' => $ticket->id,
-                    'status' => $ticket->status,
-                    'updated_at' => $ticket->updated_at,
-                    'ticket_history' => [
-                        'id' => $history->id,
-                        'action' => $history->action,
-                        'old_status' => $history->old_status,
-                        'new_status' => $history->new_status,
-                        'updated_by' => $history->updated_by,
-                        'timestamp' => $history->timestamp
-                    ]
-                ]
+                'data' => new TicketResource($ticket)
             ]);
             
         } catch (\Exception $e) {
