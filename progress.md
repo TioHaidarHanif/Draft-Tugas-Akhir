@@ -190,6 +190,14 @@
 - Semua test relevan lulus.
 - Dokumentasi dan progress.md diperbarui.
 
+### Fitur: Informasi Jumlah Chat & Status Chat Terbaca pada Ticket (Juni 2025)
+- Menambahkan relasi dan accessor pada model Ticket untuk `chat_count` dan `has_unread_chat`.
+- Menambahkan model dan migrasi `ChatMessageRead` untuk status terbaca per user pada chat.
+- Modifikasi endpoint `/tickets` (list & detail) agar response menyertakan `chat_count` dan `has_unread_chat`.
+- Query efisien dengan eager loading dan withCount untuk menghindari N+1 query.
+- Menambahkan feature test untuk validasi field baru pada API.
+- Semua pengujian terkait fitur ini telah lolos.
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features
@@ -219,6 +227,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000019_create_chat_attachments_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000020_create_faqs_table.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000021_create_email_logs_table.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/migrations/0001_01_01_000022_create_chat_message_reads_table.php`
 
 ### Models
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/User.php` (modified)
@@ -233,6 +242,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatAttachment.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/Faq.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/EmailLog.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Models/ChatMessageRead.php`
 
 ### Seeders
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/database/seeders/RoleSeeder.php`
@@ -273,3 +283,4 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Faq/FaqControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Email/EmailControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/TicketTokenTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Chat/ChatMessageReadTest.php`

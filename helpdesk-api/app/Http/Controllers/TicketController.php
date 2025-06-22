@@ -102,7 +102,16 @@ class TicketController extends Controller
         $sortOrder = $filters['sortOrder'] ?? 'desc';
         $query->orderBy($sortBy, $sortOrder);
         $perPage = $filters['per_page'] ?? 10;
-        $tickets = $query->with(['attachment'])->paginate($perPage);
+        $tickets = $query->with(['attachment'])
+            ->withCount('chatMessages')
+            ->paginate($perPage);
+        // Tambahkan field has_unread_chat pada setiap ticket
+        $tickets->getCollection()->transform(function ($ticket) use ($user) {
+            $ticketArr = $ticket->toArray();
+            $ticketArr['chat_count'] = $ticket->chat_count;
+            $ticketArr['has_unread_chat'] = $ticket->has_unread_chat;
+            return $ticketArr;
+        });
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -120,7 +129,9 @@ class TicketController extends Controller
     // GET /tickets/{id}
     public function show($id)
     {
-        $ticket = Ticket::with(['attachment', 'histories', 'feedbacks'])->findOrFail($id);
+        $ticket = Ticket::with(['attachment', 'histories', 'feedbacks'])
+            ->withCount('chatMessages')
+            ->findOrFail($id);
         $user = Auth::user();
         $includeToken = false;
         if ($user->role === 'admin') {
@@ -129,6 +140,8 @@ class TicketController extends Controller
             $includeToken = true;
         }
         $ticketArr = $ticket->toArray();
+        $ticketArr['chat_count'] = $ticket->chat_count;
+        $ticketArr['has_unread_chat'] = $ticket->has_unread_chat;
         if ($includeToken) {
             $ticketArr['token'] = $ticket->token;
         } else {

@@ -151,4 +151,27 @@ class Ticket extends Model
     {
         return hash_equals($this->token, $token);
     }
+
+    public function getChatCountAttribute()
+    {
+        // Gunakan eager loading withCount('chatMessages') jika memungkinkan
+        if (array_key_exists('chat_messages_count', $this->getAttributes())) {
+            return $this->getAttribute('chat_messages_count');
+        }
+        return $this->chatMessages()->count();
+    }
+
+    public function getHasUnreadChatAttribute()
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        // Asumsi ada tabel chat_reads atau field is_read pada ChatMessage, jika tidak, perlu dibuat
+        // Di sini diasumsikan ada relasi unread untuk user pada ChatMessage
+        return $this->chatMessages()
+            ->whereDoesntHave('reads', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->where('user_id', '!=', $user->id) // exclude own messages
+            ->exists();
+    }
 }

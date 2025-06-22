@@ -29,4 +29,10 @@ class ChatMessage extends Model
     {
         return $this->hasMany(ChatAttachment::class);
     }
+
+    public function reads()
+    {
+        // Relasi ke tabel chat_message_reads (pivot: chat_message_id, user_id, read_at)
+        return $this->hasMany(\App\Models\ChatMessageRead::class);
+    }
 }
