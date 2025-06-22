@@ -36,6 +36,7 @@ class TicketFactory extends Factory
             'category_id' => $category->id,
             'sub_category_id' => $subCategory->id,
             'status' => $this->faker->randomElement(['open', 'in_progress', 'resolved', 'closed']),
+            'priority' => $this->faker->randomElement(['low', 'medium', 'high', 'urgent']),
             'assigned_to' => null,
             'nim' => $this->faker->numerify('########'),
             'nama' => $this->faker->name(),

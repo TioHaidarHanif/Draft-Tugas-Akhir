@@ -67,6 +67,7 @@ class TicketController extends Controller
             'category_id' => 'required|exists:categories,id',
             'sub_category_id' => 'required|exists:sub_categories,id',
             'deskripsi' => 'required|string',
+            'priority' => 'nullable|in:low,medium,high,urgent',
             'lampiran' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB
         ]);
 
@@ -109,6 +110,7 @@ class TicketController extends Controller
             $ticket->sub_category_id = $request->input('sub_category_id');
             $ticket->deskripsi = $request->input('deskripsi');
             $ticket->status = 'open';
+            $ticket->priority = $request->input('priority', 'medium'); // Default priority is medium
             
             // Set read flags
             $ticket->read_by_student = true; // Creator has read it
@@ -296,6 +298,7 @@ class TicketController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'status' => 'required|in:open,in_progress,resolved,closed',
+            'priority' => 'sometimes|nullable|in:low,medium,high,urgent',
             'comment' => 'nullable|string'
         ]);
         
@@ -335,9 +338,12 @@ class TicketController extends Controller
         try {
             $oldStatus = $ticket->status;
             $newStatus = $request->status;
+            $oldPriority = $ticket->priority;
+            $newPriority = $request->input('priority', $oldPriority);
             
-            // Update ticket status
+            // Update ticket status and priority
             $ticket->status = $newStatus;
+            $ticket->priority = $newPriority;
             $ticket->save();
             
             // Create ticket history
@@ -346,6 +352,8 @@ class TicketController extends Controller
             $history->action = 'status_change';
             $history->old_status = $oldStatus;
             $history->new_status = $newStatus;
+            $history->old_priority = $oldPriority;
+            $history->new_priority = $newPriority;
             $history->updated_by = $user->id;
             $history->timestamp = now();
             $history->save();
@@ -380,6 +388,92 @@ class TicketController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update ticket status: ' . $e->getMessage(),
+                'code' => 500
+            ], 500);
+        }
+    }
+    
+    /**
+     * Update the priority of a specific ticket
+     * 
+     * @param Request $request
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updatePriority(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'priority' => 'required|in:low,medium,high,urgent',
+            'comment' => 'nullable|string'
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+                'code' => 422
+            ], 422);
+        }
+        
+        $user = Auth::user();
+        $ticket = Ticket::findOrFail($id);
+        
+        // Check authorization (admins and assigned disposisi can update priority)
+        if ($user->role !== 'admin' && 
+            !($user->role === 'disposisi' && $ticket->assigned_to === $user->id)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You are not authorized to update this ticket priority',
+                'code' => 403
+            ], 403);
+        }
+        
+        DB::beginTransaction();
+        try {
+            $oldPriority = $ticket->priority;
+            $newPriority = $request->priority;
+            
+            // Update ticket priority
+            $ticket->priority = $newPriority;
+            $ticket->save();
+            
+            // Create ticket history
+            $history = new TicketHistory();
+            $history->ticket_id = $ticket->id;
+            $history->action = 'priority_change';
+            $history->old_priority = $oldPriority;
+            $history->new_priority = $newPriority;
+            $history->comment = $request->comment ?? "Priority changed from $oldPriority to $newPriority";
+            $history->updated_by = $user->id;
+            $history->timestamp = now();
+            $history->save();
+            
+            // Create notification for priority change
+            $this->notificationService->createTicketUpdateNotification(
+                $ticket,
+                'priority_change',
+                "Ticket priority changed from $oldPriority to $newPriority",
+                $user->id
+            );
+            
+            // Commit transaction
+            DB::commit();
+            
+            // Return success response
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ticket priority updated successfully',
+                'data' => new TicketDetailResource($ticket)
+            ]);
+            
+        } catch (\Exception $e) {
+            // Rollback transaction on error
+            DB::rollBack();
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update ticket priority: ' . $e->getMessage(),
                 'code' => 500
             ], 500);
         }

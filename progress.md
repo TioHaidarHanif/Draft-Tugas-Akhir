@@ -417,6 +417,28 @@
 #### Migration
 - Added `2025_06_18_010903_add_token_to_tickets_table` migration
 
+### Ticket Priority Feature (June 22, 2025)
+
+#### Database Changes
+- Added `priority` field to `tickets` table with enum values: low, medium, high, urgent
+- Added `old_priority` and `new_priority` fields to `ticket_histories` table
+- Default ticket priority set to 'medium'
+
+#### API Endpoints
+- Modified ticket creation endpoint to accept priority parameter
+- Added new endpoint to update ticket priority: PATCH `/api/tickets/{id}/priority`
+- Updated ticket status update endpoint to also handle priority updates
+
+#### Business Logic
+- Added validation for priority values
+- Implemented authorization checks (admin and assigned disposisi can update priority)
+- Added priority change history tracking
+- Enhanced notification system to handle priority updates
+
+#### Testing
+- Added unit and feature tests for ticket priority functionality
+- Tested creation, updating, and validation of priority field
+
 ### Next Steps
 1. Create ticket management API endpoints
 2. Implement ticket feedback and history tracking

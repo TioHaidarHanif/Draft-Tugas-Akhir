@@ -27,10 +27,13 @@ class TicketHistory extends Model
         'action',
         'old_status',
         'new_status',
+        'old_priority',
+        'new_priority',
         'assigned_by',
         'assigned_to',
         'updated_by',
         'timestamp',
+        'comment',
     ];
 
     /**

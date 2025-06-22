@@ -37,6 +37,7 @@ class TicketResource extends JsonResource
                 ];
             }),
             'status' => $this->status,
+            'priority' => $this->priority,
             'assigned_to' => $this->assigned_to,
             'assigned_user' => $this->whenLoaded('assignedTo', function () {
                 return [

@@ -132,6 +132,66 @@ class NotificationService
     }
     
     /**
+     * Create a notification for ticket updates (status, priority, etc.)
+     *
+     * @param Ticket $ticket
+     * @param string $updateType
+     * @param string $message
+     * @param string $updatedById
+     * @return void
+     */
+    public function createTicketUpdateNotification(Ticket $ticket, $updateType, $message, $updatedById)
+    {
+        // Check who updated the ticket
+        $updatedBy = User::find($updatedById);
+        
+        if (!$updatedBy) {
+            return;
+        }
+        
+        // Determine notification title based on update type
+        $title = 'Tiket Diperbarui';
+        switch ($updateType) {
+            case 'status_change':
+                $title = 'Status Tiket Diperbarui';
+                break;
+            case 'priority_change':
+                $title = 'Prioritas Tiket Diperbarui';
+                break;
+            case 'assignment':
+                $title = 'Tiket Telah Ditugaskan';
+                break;
+            default:
+                $title = 'Tiket Diperbarui';
+                break;
+        }
+        
+        // If updated by admin or disposisi, notify student
+        if ($updatedBy->role === 'admin' || $updatedBy->role === 'disposisi') {
+            $this->notifyStudentAboutTicketUpdate($ticket, $title, $message, $updateType, $updatedById);
+        }
+        
+        // If updated by student, notify admin and assigned disposisi
+        if ($updatedBy->role === 'student') {
+            $this->notifyAdminsAboutTicketUpdate($ticket, $title, $message, $updateType, $updatedById);
+            
+            if ($ticket->assigned_to) {
+                $this->notifyUserAboutTicketUpdate($ticket, $title, $message, $updateType, $updatedById, $ticket->assigned_to);
+            }
+        }
+        
+        // If updated by disposisi, also notify admin
+        if ($updatedBy->role === 'disposisi') {
+            $this->notifyAdminsAboutTicketUpdate($ticket, $title, $message, $updateType, $updatedById);
+        }
+        
+        // If updated by admin, notify assigned disposisi (if any)
+        if ($updatedBy->role === 'admin' && $ticket->assigned_to) {
+            $this->notifyUserAboutTicketUpdate($ticket, $title, $message, $updateType, $updatedById, $ticket->assigned_to);
+        }
+    }
+    
+    /**
      * Notify the student (ticket creator) about a status change.
      *
      * @param Ticket $ticket
@@ -287,5 +347,83 @@ class NotificationService
             'message' => $message,
             'type' => 'feedback'
         ]);
+    }
+    
+    /**
+     * Notify the student (ticket creator) about a ticket update.
+     *
+     * @param Ticket $ticket
+     * @param string $title
+     * @param string $message
+     * @param string $updateType
+     * @param string $updatedById
+     * @return void
+     */
+    private function notifyStudentAboutTicketUpdate(Ticket $ticket, $title, $message, $updateType, $updatedById)
+    {
+        Notification::create([
+            'recipient_id' => $ticket->user_id,
+            'recipient_role' => 'student',
+            'sender_id' => $updatedById,
+            'ticket_id' => $ticket->id,
+            'title' => $title,
+            'message' => $message,
+            'type' => $updateType
+        ]);
+    }
+    
+    /**
+     * Notify all admins about a ticket update.
+     *
+     * @param Ticket $ticket
+     * @param string $title
+     * @param string $message
+     * @param string $updateType
+     * @param string $updatedById
+     * @return void
+     */
+    private function notifyAdminsAboutTicketUpdate(Ticket $ticket, $title, $message, $updateType, $updatedById)
+    {
+        $admins = User::where('role', 'admin')->get();
+        
+        foreach ($admins as $admin) {
+            Notification::create([
+                'recipient_id' => $admin->id,
+                'recipient_role' => 'admin',
+                'sender_id' => $updatedById,
+                'ticket_id' => $ticket->id,
+                'title' => $title,
+                'message' => $message,
+                'type' => $updateType
+            ]);
+        }
+    }
+    
+    /**
+     * Notify a specific user about a ticket update.
+     *
+     * @param Ticket $ticket
+     * @param string $title
+     * @param string $message
+     * @param string $updateType
+     * @param string $updatedById
+     * @param string $userId
+     * @return void
+     */
+    private function notifyUserAboutTicketUpdate(Ticket $ticket, $title, $message, $updateType, $updatedById, $userId)
+    {
+        $user = User::find($userId);
+        
+        if ($user) {
+            Notification::create([
+                'recipient_id' => $userId,
+                'recipient_role' => $user->role,
+                'sender_id' => $updatedById,
+                'ticket_id' => $ticket->id,
+                'title' => $title,
+                'message' => $message,
+                'type' => $updateType
+            ]);
+        }
     }
 }

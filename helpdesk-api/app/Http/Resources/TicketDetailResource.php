@@ -23,6 +23,8 @@ class TicketDetailResource extends TicketResource
                     'action' => $history->action,
                     'old_status' => $history->old_status,
                     'new_status' => $history->new_status,
+                    'old_priority' => $history->old_priority,
+                    'new_priority' => $history->new_priority,
                     'old_assigned_to' => $history->old_assigned_to,
                     'new_assigned_to' => $history->new_assigned_to,
                     'comment' => $history->comment,
