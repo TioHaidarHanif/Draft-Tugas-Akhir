@@ -91,3 +91,47 @@ Fitur ini memungkinkan setiap ticket anonymous memiliki token rahasia yang hanya
 - Controller: `app/Http/Controllers/TicketController.php`
 - FormRequest: `app/Http/Requests/RevealTicketTokenRequest.php`
 - Route: `routes/api.php`
+
+## Ticket Prioritas
+
+Fitur prioritas ticket:
+- Kolom prioritas pada tabel tickets (low, medium, high, urgent; default: medium)
+- Endpoint pembuatan & update ticket support prioritas
+- Validasi prioritas pada input
+- Response API menampilkan prioritas
+- Unit test & feature test prioritas ticket
+
+### Cara migrasi
+```
+php artisan migrate
+```
+
+### Contoh request pembuatan ticket dengan prioritas
+```
+POST /api/tickets
+{
+  "judul": "Contoh Ticket",
+  "deskripsi": "Isi deskripsi",
+  ...,
+  "prioritas": "high"
+}
+```
+
+### Contoh response
+```
+{
+  "status": "success",
+  "data": {
+    ...,
+    "prioritas": "high"
+  }
+}
+```
+
+### Nilai prioritas yang valid
+- low
+- medium
+- high
+- urgent
+
+Jika tidak diisi, prioritas otomatis menjadi medium.

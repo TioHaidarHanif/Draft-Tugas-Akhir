@@ -37,6 +37,7 @@ class Ticket extends Model
         'read_by_disposisi',
         'read_by_student',
         'token', // tambahkan token agar mass assignable
+        'prioritas', // tambahkan prioritas agar mass assignable
     ];
 
     /**

@@ -8,6 +8,7 @@ use App\Http\Requests\AssignTicketRequest;
 use App\Http\Requests\AddTicketFeedbackRequest;
 use App\Http\Requests\TicketListFilterRequest;
 use App\Http\Requests\RevealTicketTokenRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Ticket;
 use App\Models\TicketHistory;
 use App\Models\TicketFeedback;
@@ -34,6 +35,7 @@ class TicketController extends Controller
             $data['read_by_admin'] = false;
             $data['read_by_disposisi'] = false;
             $data['read_by_student'] = false;
+            $data['prioritas'] = $data['prioritas'] ?? 'medium'; // set default prioritas
             $ticket = Ticket::create($data);
             // Lampiran (support multiple files)
             $attachments = [];
@@ -110,6 +112,7 @@ class TicketController extends Controller
             $ticketArr = $ticket->toArray();
             $ticketArr['chat_count'] = $ticket->chat_count;
             $ticketArr['has_unread_chat'] = $ticket->has_unread_chat;
+            $ticketArr['prioritas'] = $ticket->prioritas; // pastikan prioritas tampil
             return $ticketArr;
         });
         return response()->json([
@@ -142,6 +145,7 @@ class TicketController extends Controller
         $ticketArr = $ticket->toArray();
         $ticketArr['chat_count'] = $ticket->chat_count;
         $ticketArr['has_unread_chat'] = $ticket->has_unread_chat;
+        $ticketArr['prioritas'] = $ticket->prioritas; // pastikan prioritas tampil
         if ($includeToken) {
             $ticketArr['token'] = $ticket->token;
         } else {
@@ -404,5 +408,28 @@ class TicketController extends Controller
                 'token' => $ticket->token
             ]
         ]);
+    }
+
+    // PATCH /tickets/{id}
+    public function update(UpdateTicketRequest $request, $id)
+    {
+        return \DB::transaction(function () use ($request, $id) {
+            $ticket = Ticket::findOrFail($id);
+            $user = $request->user();
+            // Hanya pemilik ticket atau admin/disposisi yang boleh update
+            if ($user->role === 'student' && $ticket->user_id !== $user->id) {
+                return response()->json(['status' => 'error', 'message' => 'Forbidden', 'code' => 403], 403);
+            }
+            $data = $request->validated();
+            if (empty($data['prioritas'])) {
+                unset($data['prioritas']); // jangan update jika tidak ada input
+            }
+            $ticket->update($data);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ticket updated successfully',
+                'data' => $ticket->toArray(),
+            ]);
+        });
     }
 }

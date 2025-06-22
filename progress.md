@@ -198,6 +198,14 @@
 - Menambahkan feature test untuk validasi field baru pada API.
 - Semua pengujian terkait fitur ini telah lolos.
 
+### Fitur prioritas ticket
+- Migrasi kolom prioritas pada tabel tickets
+- Model Ticket: prioritas mass assignable
+- Validasi prioritas pada pembuatan & update ticket
+- Endpoint create & update ticket support prioritas
+- Response API menampilkan prioritas
+- Unit test & feature test prioritas ticket
+
 ### Design Decisions
 1. Used UUIDs for primary keys on key entities (tickets, notifications) for security and scalability
 2. Kept regular auto-increment IDs for users to simplify integration with existing Laravel features

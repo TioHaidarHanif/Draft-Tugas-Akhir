@@ -24,6 +24,7 @@ class StoreTicketRequest extends FormRequest
             'no_hp' => 'required|string|max:20',
             'anonymous' => 'boolean',
             'lampiran' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf',
+            'prioritas' => 'nullable|string|in:low,medium,high,urgent',
         ];
     }
 }
