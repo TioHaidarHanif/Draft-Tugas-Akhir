@@ -123,6 +123,20 @@ class TicketController extends Controller
             // Upload attachment if provided
             if ($request->hasFile('lampiran')) {
                 $file = $request->file('lampiran');
+                
+                // Validate file type and size
+                $validator = Validator::make(['lampiran' => $file], [
+                    'lampiran' => 'file|mimes:jpg,jpeg,png,pdf|max:10240', // 10MB = 10240KB
+                ]);
+                
+                if ($validator->fails()) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'File validation failed',
+                        'errors' => $validator->errors()
+                    ], 422);
+                }
+                
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('attachments', $fileName, 'public');
                 

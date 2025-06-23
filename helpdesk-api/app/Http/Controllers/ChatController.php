@@ -147,11 +147,14 @@ class ChatController extends Controller
         // Validate request
         $validator = Validator::make($request->all(), [
             'message' => 'nullable|string|max:10000',
-            'file' => 'required|file|max:10240', // 10MB max
+            'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240', // 10MB max, only JPG, PNG, PDF
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'File validation failed',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         // Create chat message
