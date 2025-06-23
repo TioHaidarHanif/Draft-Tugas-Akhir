@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,6 +70,9 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            // Log the registration activity
+            ActivityLogService::logAuth('register', 'User registered successfully', $user->id);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'User registered successfully',
@@ -100,6 +104,9 @@ class AuthController extends Controller
             ]);
 
             if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                // Log the failed login attempt
+                ActivityLogService::logAuth('login_failed', 'Failed login attempt for email: ' . $request->email);
+                
                 return response()->json([
                     'status' => 'error',
                     'message' => 'The provided credentials are incorrect.',
@@ -109,6 +116,9 @@ class AuthController extends Controller
 
             $user = User::where('email', $request->email)->firstOrFail();
             $token = $user->createToken('auth_token')->plainTextToken;
+
+            // Log the successful login activity
+            ActivityLogService::logAuth('login', 'User logged in successfully', $user->id);
 
             return response()->json([
                 'status' => 'success',
@@ -141,7 +151,13 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
+        // Get user ID before we delete the token
+        $userId = $request->user()->id;
+        
         $request->user()->currentAccessToken()->delete();
+
+        // Log the logout activity
+        ActivityLogService::logAuth('logout', 'User logged out successfully', $userId);
 
         return response()->json([
             'status' => 'success',

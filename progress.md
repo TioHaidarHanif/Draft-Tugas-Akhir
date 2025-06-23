@@ -14,6 +14,7 @@
 - Created `ticket_feedbacks` table
 - Created `notifications` table with UUID
 - Created `faqs` table with UUID and soft deletes (May 30, 2025)
+- Created `activity_logs` table for tracking user activities (June 23, 2025)
 
 #### Models Created
 - Enhanced `User` model with relationships
@@ -25,6 +26,7 @@
 - Created `TicketFeedback` model
 - Created `Notification` model with UUID
 - Created `FAQ` model with soft deletes and UUID (May 30, 2025)
+- Created `ActivityLog` model for storing user activity data (June 23, 2025)
 
 #### Seeders Created
 - Created `RoleSeeder` for default user roles (admin, disposisi, user)
@@ -636,3 +638,30 @@ Feature dapat diuji dengan:
 1. Frontend dapat menampilkan badge atau indikator untuk ticket dengan chat yang belum terbaca
 2. Menambahkan fitur notifikasi real-time untuk chat baru
 3. Implementasi fitur "mark all as read" untuk chat
+
+### Auth and User Activity Logging (June 23, 2025)
+
+#### Features Implemented
+- Created activity logging system to track user activities throughout the application
+- Added logging for authentication events (login, logout, registration)
+- Added logging for user management activities (profile updates, role changes)
+- Created admin dashboard for viewing and analyzing user activity
+
+#### Components Created
+- Created `activity_logs` table with user_id, activity, description, IP address, and user agent
+- Created `ActivityLogService` with specialized methods for different activity types
+- Created `ActivityLogController` with endpoints for listing, filtering, and analyzing logs
+- Added admin-only routes for accessing activity logs
+
+#### Tests Created
+- Created `ActivityLogServiceTest` for testing the logging service functionality
+- Created `ActivityLogControllerTest` for testing the admin endpoints with proper authorization
+
+#### Documentation
+- Created detailed documentation for the activity logging system in `/docs/activity-logging.md`
+- Updated progress tracking documentation
+
+#### Security Enhancements
+- Added IP address and user agent tracking for security auditing
+- Implemented admin-only access to log data
+- Added activity categorization for easier analysis

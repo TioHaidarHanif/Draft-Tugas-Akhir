@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Ticket;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -132,6 +133,9 @@ class UserController extends Controller
         
         $user->save();
         
+        // Log the user update activity
+        ActivityLogService::logUserManagement('update', 'User profile updated: ' . $user->id);
+        
         return response()->json([
             'status' => 'success',
             'message' => 'User updated successfully',
@@ -174,6 +178,12 @@ class UserController extends Controller
         $user->role = $request->role;
         $user->save();
         
+        // Log the role update activity
+        ActivityLogService::logUserManagement(
+            'role_update', 
+            'User role updated to ' . $request->role . ' for user: ' . $user->id
+        );
+        
         return response()->json([
             'status' => 'success',
             'message' => 'User role updated successfully',
@@ -212,6 +222,9 @@ class UserController extends Controller
         }
         
         $user->delete();
+        
+        // Log the user deletion activity
+        ActivityLogService::logUserManagement('delete', 'User deleted: ' . $user->id);
         
         return response()->json([
             'status' => 'success',

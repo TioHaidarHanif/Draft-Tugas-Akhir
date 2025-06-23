@@ -93,6 +93,13 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Create and manage FAQ entries
 - Convert resolved tickets to FAQ entries
 
+### Activity Logging
+- Comprehensive logging of user activities
+- Authentication event tracking (login, logout, registration)
+- User management activity tracking
+- Admin dashboard for reviewing activity logs
+- IP address and user agent tracking for security
+
 ## Token Rahasia Feature
 
 The system includes a feature for anonymous ticket verification:

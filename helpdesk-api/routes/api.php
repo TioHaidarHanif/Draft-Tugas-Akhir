@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EmailController;
@@ -155,5 +156,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Email Management Routes (Admin only)
         Route::post('/emails/send', [EmailController::class, 'send']);
         Route::get('/emails/logs', [EmailController::class, 'logs']);
+        
+        // Activity Log Routes (Admin only)
+        Route::get('/activity-logs', [ActivityLogController::class, 'index']);
+        Route::get('/activity-logs/statistics', [ActivityLogController::class, 'statistics']);
+        Route::get('/activity-logs/{id}', [ActivityLogController::class, 'show']);
     });
 });
