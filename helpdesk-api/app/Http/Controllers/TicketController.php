@@ -36,6 +36,28 @@ class TicketController extends Controller
             $data['read_by_disposisi'] = false;
             $data['read_by_student'] = false;
             $data['prioritas'] = $data['prioritas'] ?? 'medium'; // set default prioritas
+
+            // Validasi lampiran (multiple files)
+            if ($request->hasFile('lampiran')) {
+                $lampiranFiles = $request->file('lampiran');
+                if (!is_array($lampiranFiles)) {
+                    $lampiranFiles = [$lampiranFiles];
+                }
+                foreach ($lampiranFiles as $file) {
+                    $validator = \Validator::make([
+                        'file' => $file
+                    ], [
+                        'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
+                    ]);
+                    if ($validator->fails()) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => $validator->errors()->first('file')
+                        ], 422);
+                    }
+                }
+            }
+
             $ticket = Ticket::create($data);
             // Lampiran (support multiple files)
             $attachments = [];

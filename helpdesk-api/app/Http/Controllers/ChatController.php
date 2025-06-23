@@ -49,10 +49,17 @@ class ChatController extends Controller
     {
         $ticket = Ticket::findOrFail($ticketId);
         $this->authorizeAccess($ticket);
-        $request->validate([
-            'chat_message_id' => 'required|exists:chat_messages,id',
-            'file' => 'required|file|max:10240', // 10MB
-        ]);
+        try {
+            $request->validate([
+                'chat_message_id' => 'required|exists:chat_messages,id',
+                'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240', // 10MB
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->validator->errors()->first('file')
+            ], 422);
+        }
         $file = $request->file('file');
         $path = $file->store('chat_attachments');
         $attachment = ChatAttachment::create([
