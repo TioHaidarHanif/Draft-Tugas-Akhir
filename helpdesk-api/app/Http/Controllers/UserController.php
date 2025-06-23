@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
+use App\Services\ActivityLogService;
 
 class UserController extends Controller
 {
@@ -88,6 +89,16 @@ class UserController extends Controller
             'email' => 'email|nullable|unique:users,email,' . $id,
         ]);
         $user->update($validated);
+
+        // Log aktivitas update profil
+        ActivityLogService::log(
+            $user->id,
+            'update_profile',
+            'User updated profile',
+            $request->ip(),
+            $request->userAgent()
+        );
+
         return response()->json([
             'status' => 'success',
             'data' => $user
@@ -109,6 +120,16 @@ class UserController extends Controller
         ]);
         $user->role = $validated['role'];
         $user->save();
+
+        // Log aktivitas update role
+        ActivityLogService::log(
+            $user->id,
+            'update_role',
+            'User role updated to ' . $user->role,
+            $request->ip(),
+            $request->userAgent()
+        );
+
         return response()->json([
             'status' => 'success',
             'data' => $user
@@ -125,7 +146,16 @@ class UserController extends Controller
                 'message' => 'User not found'
             ], 404);
         }
+        // Log aktivitas hapus user (sebelum dihapus)
+        ActivityLogService::log(
+            $user->id,
+            'delete_user',
+            'User deleted',
+            request()->ip(),
+            request()->userAgent()
+        );
         $user->delete();
+
         return response()->json([
             'status' => 'success',
             'message' => 'User deleted successfully'

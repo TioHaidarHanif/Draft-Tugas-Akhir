@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,6 +70,15 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            // Log aktivitas register
+            ActivityLogService::log(
+                $user->id,
+                'register',
+                'User registered',
+                $request->ip(),
+                $request->userAgent()
+            );
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'User registered successfully',
@@ -110,6 +120,15 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)->firstOrFail();
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            // Log aktivitas login
+            ActivityLogService::log(
+                $user->id,
+                'login',
+                'User logged in',
+                $request->ip(),
+                $request->userAgent()
+            );
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Login successful',
@@ -141,7 +160,17 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
+        $user = $request->user();
         $request->user()->currentAccessToken()->delete();
+
+        // Log aktivitas logout
+        ActivityLogService::log(
+            $user ? $user->id : null,
+            'logout',
+            'User logged out',
+            $request->ip(),
+            $request->userAgent()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -170,6 +199,36 @@ class AuthController extends Controller
                     'created_at' => $user->created_at
                 ]
             ]
+        ]);
+    }
+
+    /**
+     * Update authenticated user's profile.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $validated = $request->validate([
+            'name' => 'string|nullable',
+            'email' => 'email|nullable|unique:users,email,' . $user->id,
+        ]);
+        $user->update($validated);
+
+        // Log aktivitas update profil
+        ActivityLogService::log(
+            $user->id,
+            'update_profile',
+            'User updated own profile',
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $user
         ]);
     }
 }
