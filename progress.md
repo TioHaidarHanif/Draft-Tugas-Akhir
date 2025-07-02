@@ -490,6 +490,7 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/FAQController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/EmailController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ApiDocumentationController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
@@ -665,3 +666,35 @@ Feature dapat diuji dengan:
 - Added IP address and user agent tracking for security auditing
 - Implemented admin-only access to log data
 - Added activity categorization for easier analysis
+
+### API Documentation (July 2, 2025)
+
+#### Controllers Created
+- Implemented `ApiDocumentationController` that automatically:
+  - Scans all routes in the application
+  - Extracts route information (method, path, controller, middleware)
+  - Parses controller method documentation
+  - Groups routes by controller for better organization
+  - Provides authentication information and constraints
+
+#### Views Created
+- Created `api-documentation.blade.php` with:
+  - Responsive design using Bootstrap 5
+  - Interactive endpoint display with collapsible sections
+  - Mobile-friendly sidebar navigation
+  - Syntax highlighting for code examples
+  - Authentication instructions and examples
+  - Error handling documentation
+
+#### Routes Updated
+- Updated the root route (`/`) to display the API documentation
+- Replaced default Laravel welcome page with the API documentation
+
+#### Features Implemented
+- Automatic route scanning and documentation generation
+- Display of authentication requirements and role restrictions per endpoint
+- Detailed parameter information extraction
+- Interactive UI with collapsible sections for better readability
+- Mobile-responsive design
+- Clear examples for API requests using curl
+- Comprehensive error code documentation

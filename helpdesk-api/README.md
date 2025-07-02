@@ -100,6 +100,14 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - Admin dashboard for reviewing activity logs
 - IP address and user agent tracking for security
 
+### API Documentation
+- Automatic generation of API documentation
+- Interactive documentation interface
+- Authentication and authorization examples
+- Request and response samples for all endpoints
+- Role-based access information for each endpoint
+- Error response documentation
+
 ## Token Rahasia Feature
 
 The system includes a feature for anonymous ticket verification:
