@@ -135,3 +135,26 @@ POST /api/tickets
 - urgent
 
 Jika tidak diisi, prioritas otomatis menjadi medium.
+
+# Helpdesk API
+
+## 📄 Landing Page Dokumentasi API Otomatis
+
+Aplikasi ini memiliki landing page otomatis di `/` yang menampilkan dokumentasi seluruh endpoint API secara dinamis. Fitur ini:
+
+- Membaca seluruh endpoint API dari file routes dan controller.
+- Menampilkan daftar endpoint (method, path, keterangan, middleware).
+- Menjelaskan cara menggunakan API (login, autentikasi, format request/response, contoh cURL/Postman).
+- Menampilkan batasan penting (validasi file, role akses, dsb).
+- Tampilan rapi, responsif, dan mudah dipahami.
+- Dokumentasi selalu up-to-date mengikuti perubahan route.
+
+**Akses dokumentasi:**
+- Buka root URL aplikasi (`/`) di browser.
+
+**Contoh tampilan:**
+- Tabel endpoint, penjelasan autentikasi, contoh request/response, dan batasan penting.
+
+## Cara Menambah/Mengubah Endpoint
+- Tambahkan/ubah route di file `routes/api.php` atau controller terkait.
+- Landing page dokumentasi akan otomatis menyesuaikan.

@@ -266,12 +266,14 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ChatController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/FaqController.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/EmailController.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Controllers/ApiDocsController.php`
 
 ### Middleware
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/app/Http/Middleware/CheckRole.php`
 
 ### Routes
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/routes/api.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/routes/web.php`
 
 ### Tests
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Models/UserTest.php`
@@ -292,3 +294,13 @@
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Email/EmailControllerTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/TicketTokenTest.php`
 - `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/Chat/ChatMessageReadTest.php`
+- `/workspaces/Draft-Tugas-Akhir/helpdesk-api/tests/Feature/ApiDocsTest.php`
+
+# Progress Log
+
+## [Tanggal: 2025-07-02]
+- Menambahkan landing page otomatis untuk dokumentasi API:
+  - Membuat controller `ApiDocsController` untuk generate dokumentasi API dari route Laravel.
+  - Menambahkan route `/` di `web.php` untuk menampilkan dokumentasi API.
+  - Membuat view `resources/views/api-docs.blade.php` yang menampilkan daftar endpoint, cara penggunaan, autentikasi, contoh request/response, dan batasan penting.
+- Dokumentasi ini akan selalu up-to-date karena membaca route secara dinamis.
