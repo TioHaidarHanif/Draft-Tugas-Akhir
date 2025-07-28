@@ -1,0 +1,469 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Notification;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class NotificationControllerTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    /**
+     * Helper method to log response content
+     */
+    private function logResponse($response)
+    {
+        fwrite(STDERR, "Response: " . json_encode($response->json(), JSON_PRETTY_PRINT) . "\n");
+    }
+
+    /**
+     * Test creating a notification.
+     *
+     * @return void
+     */
+    public function test_can_create_notification()
+    {
+        // Create a sender
+        $sender = User::factory()->create(['role' => 'admin']);
+        
+        // Create a recipient
+        $recipient = User::factory()->create(['role' => 'student']);
+        
+        // Authenticate as the sender
+        $this->actingAs($sender);
+        
+        // Create notification request data
+        $notificationData = [
+            'recipient_id' => $recipient->id,
+            'title' => 'Test Notification',
+            'message' => 'This is a test notification message',
+            'type' => 'custom',
+        ];
+        
+        // Send POST request to create notification
+        $response = $this->postJson('/api/notifications', $notificationData);
+        
+        // Assert successful response
+        $response->assertStatus(201)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Notification created successfully',
+            ]);
+        
+        // Verify notification was created in the database
+        $this->assertDatabaseHas('notifications', [
+            'recipient_id' => $recipient->id,
+            'sender_id' => $sender->id,
+            'recipient_role' => $recipient->role,
+            'title' => 'Test Notification',
+            'message' => 'This is a test notification message',
+            'type' => 'custom',
+        ]);
+    }
+    
+    /**
+     * Test creating a notification for a specific role.
+     *
+     * @return void
+     */
+    public function test_can_create_notification_for_role()
+    {
+        // Create a sender
+        $sender = User::factory()->create(['role' => 'admin']);
+        
+        // Create multiple recipients with the same role
+        $recipients = User::factory()->count(3)->create(['role' => 'student']);
+        
+        // Authenticate as the sender
+        $this->actingAs($sender);
+        
+        // Create notification request data for all students
+        $notificationData = [
+            'recipient_role' => 'student',
+            'title' => 'Test Role Notification',
+            'message' => 'This is a test notification for all students',
+            'type' => 'custom',
+        ];
+        
+        // Send POST request to create notification
+        $response = $this->postJson('/api/notifications', $notificationData);
+        
+        // Assert successful response
+        $response->assertStatus(201)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Notification created successfully',
+            ]);
+        
+        // Verify notifications were created for all students
+        foreach ($recipients as $recipient) {
+            $this->assertDatabaseHas('notifications', [
+                'recipient_id' => $recipient->id,
+                'sender_id' => $sender->id,
+                'recipient_role' => 'student',
+                'title' => 'Test Role Notification',
+                'message' => 'This is a test notification for all students',
+                'type' => 'custom',
+            ]);
+        }
+    }
+    
+    /**
+     * Test validation fails when creating a notification without required fields.
+     *
+     * @return void
+     */
+    public function test_notification_creation_validation_fails()
+    {
+        // Create and authenticate user
+        $user = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($user);
+        
+        // Missing required fields
+        $response = $this->postJson('/api/notifications', []);
+        
+        // Assert validation error
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['title', 'message', 'type']);
+        
+        // Missing recipient information
+        $response = $this->postJson('/api/notifications', [
+            'title' => 'Test Notification',
+            'message' => 'This is a test message',
+            'type' => 'custom'
+        ]);
+        
+        // Assert error response
+        $response->assertStatus(422)
+            ->assertJson([
+                'status' => 'error',
+                'message' => 'Either recipient_id or recipient_role must be provided',
+            ]);
+    }
+
+    /**
+     * Test retrieving notifications for the authenticated user.
+     *
+     * @return void
+     */
+    public function test_can_get_notifications()
+    {
+        // Create a user
+        $user = User::factory()->create(['role' => 'student']);
+        
+        // Create some notifications for this user
+        for ($i = 0; $i < 5; $i++) {
+            Notification::create([
+                'recipient_id' => $user->id,
+                'recipient_role' => 'student',
+                'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+                'title' => "Test Notification {$i}",
+                'message' => "This is test notification message {$i}",
+                'type' => 'custom',
+            ]);
+        }
+        
+        // Create notifications for another user (these should not be returned)
+        $otherUser = User::factory()->create(['role' => 'student']);
+        Notification::create([
+            'recipient_id' => $otherUser->id,
+            'recipient_role' => 'student',
+            'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+            'title' => 'Other User Notification',
+            'message' => 'This notification should not be returned',
+            'type' => 'custom',
+        ]);
+        
+        // Authenticate as the user
+        $this->actingAs($user);
+        
+        // Send GET request to retrieve notifications
+        $response = $this->getJson('/api/notifications');
+        
+        // Assert successful response
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+            ]);
+    }
+    
+    /**
+     * Test filtering notifications by read status.
+     *
+     * @return void
+     */
+    public function test_can_filter_notifications_by_read_status()
+    {
+        // Create a user
+        $user = User::factory()->create(['role' => 'student']);
+        
+        // Create read notifications
+        for ($i = 0; $i < 3; $i++) {
+            Notification::create([
+                'recipient_id' => $user->id,
+                'recipient_role' => 'student',
+                'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+                'title' => "Read Notification {$i}",
+                'message' => "This is a read notification {$i}",
+                'type' => 'custom',
+                'read_at' => now(),
+            ]);
+        }
+        
+        // Create unread notifications
+        for ($i = 0; $i < 2; $i++) {
+            Notification::create([
+                'recipient_id' => $user->id,
+                'recipient_role' => 'student',
+                'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+                'title' => "Unread Notification {$i}",
+                'message' => "This is an unread notification {$i}",
+                'type' => 'custom',
+                'read_at' => null,
+            ]);
+        }
+        
+        // Authenticate as the user
+        $this->actingAs($user);
+        
+        // Test filtering for read notifications
+        $response = $this->getJson('/api/notifications?read=true');
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'notifications',
+                    'pagination'
+                ]
+            ]);
+    }
+        
+        // Verify all returned notifications are read
+        $notifications = $response->json('data.notifications');
+        if (is_array($notifications) && !empty($notifications)) {
+            foreach ($notifications as $notification) {
+                $this->assertNotNull($notification['read_at']);
+            }
+        }
+        
+        // Test filtering for unread notifications
+        $response = $this->getJson('/api/notifications?read=false');
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'notifications',
+                    'pagination'
+                ]
+            ]);
+        
+        // Verify all returned notifications are unread
+        $notifications = $response->json('data.notifications');
+        if (is_array($notifications) && !empty($notifications)) {
+            foreach ($notifications as $notification) {
+                $this->assertNull($notification['read_at']);
+            }
+        }
+    }
+    
+    /**
+     * Test filtering notifications by type.
+     *
+     * @return void
+     */
+    public function test_can_filter_notifications_by_type()
+    {
+        // Clear any existing notifications
+        Notification::query()->delete();
+        
+        // Create a user
+        $user = User::factory()->create(['role' => 'student']);
+        
+        // Create notifications with different types
+        $notificationTypes = ['new_ticket', 'assignment', 'feedback', 'custom'];
+        
+        foreach ($notificationTypes as $type) {
+            // Create 2 notifications of each type
+            for ($i = 0; $i < 2; $i++) {
+                Notification::create([
+                    'recipient_id' => $user->id,
+                    'recipient_role' => 'student',
+                    'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+                    'title' => "Notification {$type} {$i}",
+                    'message' => "This is a {$type} notification {$i}",
+                    'type' => $type,
+                ]);
+            }
+        }
+        
+        // Authenticate as the user
+        $this->actingAs($user);
+        
+        // Test filtering for each type
+        foreach ($notificationTypes as $type) {
+            $response = $this->getJson("/api/notifications?type={$type}");
+            $response->assertStatus(200)
+                ->assertJsonStructure([
+                    'status',
+                    'data' => [
+                        'notifications',
+                        'pagination'
+                    ]
+                ]);
+            
+            // Verify all returned notifications are of the requested type
+            $notifications = $response->json('data.notifications');
+            if (is_array($notifications) && !empty($notifications)) {
+                foreach ($notifications as $notification) {
+                    $this->assertEquals($type, $notification['type']);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Test marking a notification as read.
+     *
+     * @return void
+     */
+    public function test_can_mark_notification_as_read()
+    {
+        // Create a user
+        $user = User::factory()->create(['role' => 'student']);
+        
+        // Create an unread notification for the user
+        $notification = Notification::create([
+            'recipient_id' => $user->id,
+            'recipient_role' => 'student',
+            'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+            'title' => 'Test Notification',
+            'message' => 'This is a test notification to mark as read',
+            'type' => 'custom',
+            'read_at' => null,
+        ]);
+        
+        // Authenticate as the user
+        $this->actingAs($user);
+        
+        // Send PATCH request to mark notification as read
+        $response = $this->patchJson("/api/notifications/{$notification->id}/read");
+        
+        // Assert successful response
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Notification marked as read',
+            ]);
+        
+        // Verify notification is now marked as read in the database
+        $this->assertDatabaseHas('notifications', [
+            'id' => $notification->id,
+            'read_at' => now()->startOfSecond()->toDateTimeString(),
+        ]);
+    }
+    
+    /**
+     * Test unauthorized attempt to mark someone else's notification as read.
+     *
+     * @return void
+     */
+    public function test_cannot_mark_other_users_notification_as_read()
+    {
+        // Create two users
+        $user1 = User::factory()->create(['role' => 'student']);
+        $user2 = User::factory()->create(['role' => 'student']);
+        
+        // Create a notification for user2
+        $notification = Notification::create([
+            'recipient_id' => $user2->id,
+            'recipient_role' => 'student',
+            'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+            'title' => 'Test Notification',
+            'message' => 'This is a test notification for another user',
+            'type' => 'custom',
+            'read_at' => null,
+        ]);
+        
+        // Authenticate as user1
+        $this->actingAs($user1);
+        
+        // Send PATCH request to mark notification as read
+        $response = $this->patchJson("/api/notifications/{$notification->id}/read");
+        
+        // Assert error response
+        $response->assertStatus(403)
+            ->assertJson([
+                'status' => 'error',
+                'message' => 'You do not have permission to mark this notification as read',
+            ]);
+        
+        // Verify notification is still unread
+        $this->assertDatabaseHas('notifications', [
+            'id' => $notification->id,
+            'read_at' => null,
+        ]);
+    }
+    
+    /**
+     * Test marking all notifications as read.
+     *
+     * @return void
+     */
+    public function test_can_mark_all_notifications_as_read()
+    {
+        // Create a user
+        $user = User::factory()->create(['role' => 'student']);
+        
+        // Create multiple unread notifications for the user
+        for ($i = 0; $i < 5; $i++) {
+            Notification::create([
+                'recipient_id' => $user->id,
+                'recipient_role' => 'student',
+                'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+                'title' => "Test Notification {$i}",
+                'message' => "This is test notification message {$i}",
+                'type' => 'custom',
+                'read_at' => null,
+            ]);
+        }
+        
+        // Create an unread notification for another user (should remain unread)
+        $otherUser = User::factory()->create(['role' => 'student']);
+        Notification::create([
+            'recipient_id' => $otherUser->id,
+            'recipient_role' => 'student',
+            'sender_id' => User::factory()->create(['role' => 'admin'])->id,
+            'title' => 'Other User Notification',
+            'message' => 'This notification should remain unread',
+            'type' => 'custom',
+            'read_at' => null,
+        ]);
+        
+        // Authenticate as the user
+        $this->actingAs($user);
+        
+        // Send PATCH request to mark all notifications as read
+        $response = $this->patchJson('/api/notifications/read-all');
+        
+        // Assert successful response
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'All notifications marked as read',
+            ]);
+        
+        // Verify all notifications for the user are now marked as read
+        $this->assertEquals(0, Notification::where('recipient_id', $user->id)
+            ->whereNull('read_at')
+            ->count());
+        
+        // Verify the other user's notification is still unread
+        $this->assertDatabaseHas('notifications', [
+            'recipient_id' => $otherUser->id,
+            'read_at' => null,
+        ]);
+    }
+}
