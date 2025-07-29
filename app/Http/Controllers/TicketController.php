@@ -13,12 +13,15 @@ use App\Models\TicketHistory;
 use App\Models\User;
 use App\Services\ChatService;
 use App\Services\NotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use JsonException;
 
 class TicketController extends Controller
 {
@@ -56,7 +59,6 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate request data
         $validator = Validator::make($request->all(), [
             'nama' => 'nullable|required|string|max:255',
             'nim' => 'sometimes|required_if:anonymous,false|string',
@@ -80,107 +82,78 @@ class TicketController extends Controller
             ], 422);
         }
 
-        // Get current authenticated user
         $user = Auth::user();
 
-        // Start transaction
         DB::beginTransaction();
         try {
-            // Create ticket with user information
-            $ticket = new Ticket();
-            $ticket->user_id = $user->id;
-            $ticket->anonymous = $request->boolean('anonymous', false);
-            
-            // Generate token for anonymous tickets
+            $ticket = new Ticket([
+                'user_id' => $user->id,
+                'anonymous' => $request->boolean('anonymous', false),
+                'nim' => $user->nim,
+                'nama' => $user->name,
+                'email' => $user->email,
+                'prodi' => $user->prodi,
+                'semester' => $request->input('semester'),
+                'no_hp' => $user->no_hp,
+                'judul' => $request->input('judul'),
+                'category_id' => $request->input('category_id'),
+                'sub_category_id' => $request->input('sub_category_id'),
+                'deskripsi' => $request->input('deskripsi'),
+                'status' => 'open',
+                'priority' => $request->input('priority', 'medium'),
+                'read_by_student' => true,
+                'read_by_admin' => false,
+                'read_by_disposisi' => false,
+            ]);
+
             if ($ticket->anonymous) {
                 $ticket->generateToken();
             }
-            
-          // Set personal information
-            // $ticket->nim = $request->input('nim');
-            // $ticket->nama = $request->input('nama') ?? $user->name;
-            // $ticket->email = $user->email;
-            // $ticket->prodi = $request->input('prodi');
-            // $ticket->semester = $request->input('semester');
-            // $ticket->no_hp = $request->input('no_hp');
-            $ticket->nim = $user->nim;
-            $ticket->nama = $user->name;
-            $ticket->email = $user->email;
-            $ticket->prodi = $user->prodi;
-            $ticket->semester = $request->input('semester');
-            $ticket->no_hp = $user->no_hp;
-            
-            // Set ticket details
-            $ticket->judul = $request->input('judul');
-            $ticket->category_id = $request->input('category_id');
-            $ticket->sub_category_id = $request->input('sub_category_id');
-            $ticket->deskripsi = $request->input('deskripsi');
-            $ticket->status = 'open';
-            $ticket->priority = $request->input('priority', 'medium'); // Default priority is medium
-            
-            // Set read flags
-            $ticket->read_by_student = true; // Creator has read it
-            $ticket->read_by_admin = false;
-            $ticket->read_by_disposisi = false;
-            
-            // Save the ticket
+
             $ticket->save();
-            
-            // Upload attachment if provided
+
             if ($request->hasFile('lampiran')) {
                 $file = $request->file('lampiran');
-                
-                // Validate file type and size
-                $validator = Validator::make(['lampiran' => $file], [
-                    'lampiran' => 'file|mimes:jpg,jpeg,png,pdf|max:10240', // 10MB = 10240KB
+                $fileValidator = Validator::make(['lampiran' => $file], [
+                    'lampiran' => 'file|mimes:jpg,jpeg,png,pdf|max:10240',
                 ]);
-                
-                if ($validator->fails()) {
+                if ($fileValidator->fails()) {
                     DB::rollBack();
                     return response()->json([
                         'message' => 'File validation failed',
-                        'errors' => $validator->errors()
+                        'errors' => $fileValidator->errors()
                     ], 422);
                 }
-                
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('attachments', $fileName, 'public');
-                
-                // Create attachment record
-                $attachment = new TicketAttachment();
-                $attachment->ticket_id = $ticket->id;
-                $attachment->file_name = $fileName;
-                $attachment->file_type = $file->getClientMimeType();
-                $attachment->file_url = asset('storage/' . $filePath);
-                $attachment->save();
+                TicketAttachment::create([
+                    'ticket_id' => $ticket->id,
+                    'file_name' => $fileName,
+                    'file_type' => $file->getClientMimeType(),
+                    'file_url' => asset('storage/' . $filePath),
+                ]);
             }
-            
-            // Create ticket history
-            $history = new TicketHistory();
-            $history->ticket_id = $ticket->id;
-            $history->action = 'create';
-            $history->new_status = 'open';
-            $history->updated_by = $user->id;
-            $history->timestamp = now();
-            $history->save();
-            
-            // Create notification for admin users
+
+            TicketHistory::create([
+                'ticket_id' => $ticket->id,
+                'action' => 'create',
+                'new_status' => 'open',
+                'updated_by' => $user->id,
+                'timestamp' => now(),
+            ]);
+
             $this->notificationService->createNewTicketNotification($ticket);
-            
-            // Commit transaction
+
             DB::commit();
-            
-            // Return success response with ticket data
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket created successfully',
                 'data' => new TicketResource($ticket)
             ], 201);
-            
+
         } catch (\Exception $e) {
-            // Rollback transaction on error
             DB::rollBack();
-            
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to create ticket: ' . $e->getMessage(),
@@ -188,7 +161,7 @@ class TicketController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Get list of tickets based on user role with various filters
      * 
@@ -199,7 +172,7 @@ class TicketController extends Controller
     {
         $user = Auth::user();
         $query = Ticket::query();
-        
+
         // Apply role-based filtering
         if ($user->role === 'student') {
             // Students can only see their own tickets
@@ -209,31 +182,31 @@ class TicketController extends Controller
             $query->where('assigned_to', $user->id);
         }
         // Admin can see all tickets
-        
+
         // Apply filters
         if ($request->has('user_id')) {
-    $query->where('user_id', $request->user_id);
-}
+            $query->where('user_id', $request->user_id);
+        }
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
-        
+
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
         }
-        
+
         if ($request->has('sub_category_id')) {
             $query->where('sub_category_id', $request->sub_category_id);
         }
-        
+
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%");
+                    ->orWhere('deskripsi', 'like', "%{$search}%");
             });
         }
-        
+
         if ($request->has('startDate') && $request->has('endDate')) {
             $query->whereBetween('created_at', [$request->startDate, $request->endDate]);
         } elseif ($request->has('startDate')) {
@@ -241,28 +214,28 @@ class TicketController extends Controller
         } elseif ($request->has('endDate')) {
             $query->where('created_at', '<=', $request->endDate);
         }
-        
+
         // Apply sorting
         $sortBy = $request->input('sortBy', 'created_at');
         $sortOrder = $request->input('sortOrder', 'desc');
         $allowedSortFields = ['created_at', 'status', 'category_id'];
-        
+
         if (in_array($sortBy, $allowedSortFields)) {
             $query->orderBy($sortBy, $sortOrder);
         } else {
             $query->orderBy('created_at', 'desc');
         }
-        
+
         // Include relationships
         $query->with(['category', 'subCategory', 'attachments']);
-        
+
         // Use withCount to efficiently count chat messages using a subquery
         $query->withCount('chatMessages as chat_count');
-        
+
         // Paginate results
         $perPage = $request->input('per_page', 100);
         $tickets = $query->paginate($perPage);
-        
+
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -276,7 +249,7 @@ class TicketController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Get detailed information of a specific ticket
      * 
@@ -289,7 +262,7 @@ class TicketController extends Controller
         $ticket = Ticket::with(['category', 'subCategory', 'attachments', 'histories', 'feedbacks'])
             ->withCount('chatMessages as chat_count')
             ->findOrFail($id);
-            
+
         // Check authorization
         if (!$this->authorizeTicketAccess($ticket, $user)) {
             return response()->json([
@@ -298,10 +271,10 @@ class TicketController extends Controller
                 'code' => 403
             ], 403);
         }
-        
+
         // Update read status based on user role
         $this->updateTicketReadStatus($ticket, $user);
-        
+
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -309,7 +282,7 @@ class TicketController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Update the status of a ticket
      * 
@@ -324,30 +297,32 @@ class TicketController extends Controller
             'priority' => 'sometimes|nullable|in:low,medium,high,urgent',
             'comment' => 'nullable|string'
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Validation failed',
-                'errors' => $validator->errors(),
+                'errors' => $validator->errors()->all(),
                 'code' => 422
             ], 422);
         }
-        
+
         $user = Auth::user();
         $ticket = Ticket::findOrFail($id);
-        
+
         // Check authorization (admins and assigned disposisi can update status)
-        if ($user->role !== 'admin' && 
+        if (
+            $user->role !== 'admin' &&
             !($user->role === 'disposisi' && $ticket->assigned_to === $user->id) &&
-            !($user->role === 'student' && $ticket->user_id === $user->id)) {
+            !($user->role === 'student' && $ticket->user_id === $user->id)
+        ) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You are not authorized to update this ticket',
                 'code' => 403
             ], 403);
         }
-        
+
         // Student can only close tickets
         if ($user->role === 'student' && $request->status !== 'closed') {
             return response()->json([
@@ -356,19 +331,19 @@ class TicketController extends Controller
                 'code' => 403
             ], 403);
         }
-        
+
         DB::beginTransaction();
         try {
             $oldStatus = $ticket->status;
             $newStatus = $request->status;
             $oldPriority = $ticket->priority;
             $newPriority = $request->input('priority', $oldPriority);
-            
+
             // Update ticket status and priority
             $ticket->status = $newStatus;
             $ticket->priority = $newPriority;
             $ticket->save();
-            
+
             // Create ticket history
             $history = new TicketHistory();
             $history->ticket_id = $ticket->id;
@@ -380,7 +355,7 @@ class TicketController extends Controller
             $history->updated_by = $user->id;
             $history->timestamp = now();
             $history->save();
-            
+
             // Add comment if provided
             if ($request->has('comment') && !empty($request->comment)) {
                 $feedback = new TicketFeedback();
@@ -390,24 +365,24 @@ class TicketController extends Controller
                 $feedback->created_by_role = $user->role;
                 $feedback->save();
             }
-            
+
             // Create notifications based on who changed the status
             $this->notificationService->createStatusChangeNotification($ticket, $oldStatus, $newStatus, $user->id);
-            
+
             // Reset read flags for other roles
             $this->resetTicketReadFlags($ticket, $user->role);
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket status updated successfully',
                 'data' => new TicketResource($ticket)
             ]);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update ticket status: ' . $e->getMessage(),
@@ -415,7 +390,7 @@ class TicketController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Update the priority of a specific ticket
      * 
@@ -429,38 +404,40 @@ class TicketController extends Controller
             'priority' => 'required|in:low,medium,high,urgent',
             'comment' => 'nullable|string'
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Validation failed',
-                'errors' => $validator->errors(),
+                'errors' => $validator->errors()->all(),
                 'code' => 422
             ], 422);
         }
-        
+
         $user = Auth::user();
         $ticket = Ticket::findOrFail($id);
-        
+
         // Check authorization (admins and assigned disposisi can update priority)
-        if ($user->role !== 'admin' && 
-            !($user->role === 'disposisi' && $ticket->assigned_to === $user->id)) {
+        if (
+            $user->role !== 'admin' &&
+            !($user->role === 'disposisi' && $ticket->assigned_to === $user->id)
+        ) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'You are not authorized to update this ticket priority',
                 'code' => 403
             ], 403);
         }
-        
+
         DB::beginTransaction();
         try {
             $oldPriority = $ticket->priority;
             $newPriority = $request->priority;
-            
+
             // Update ticket priority
             $ticket->priority = $newPriority;
             $ticket->save();
-            
+
             // Create ticket history
             $history = new TicketHistory();
             $history->ticket_id = $ticket->id;
@@ -471,7 +448,7 @@ class TicketController extends Controller
             $history->updated_by = $user->id;
             $history->timestamp = now();
             $history->save();
-            
+
             // Create notification for priority change
             $this->notificationService->createTicketUpdateNotification(
                 $ticket,
@@ -479,21 +456,21 @@ class TicketController extends Controller
                 "Ticket priority changed from $oldPriority to $newPriority",
                 $user->id
             );
-            
+
             // Commit transaction
             DB::commit();
-            
+
             // Return success response
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket priority updated successfully',
                 'data' => new TicketDetailResource($ticket)
             ]);
-            
+
         } catch (\Exception $e) {
             // Rollback transaction on error
             DB::rollBack();
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update ticket priority: ' . $e->getMessage(),
@@ -501,7 +478,7 @@ class TicketController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Assign a ticket to a disposisi member (Admin only)
      * 
@@ -514,18 +491,18 @@ class TicketController extends Controller
         $validator = Validator::make($request->all(), [
             'assigned_to' => 'required|exists:users,id'
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Validation failed',
-                'errors' => $validator->errors(),
+                'errors' => $validator->errors()->all(),
                 'code' => 422
             ], 422);
         }
-        
+
         $user = Auth::user();
-        
+
         // Only admin can assign tickets
         if ($user->role !== 'admin') {
             return response()->json([
@@ -534,10 +511,10 @@ class TicketController extends Controller
                 'code' => 403
             ], 403);
         }
-        
+
         $ticket = Ticket::findOrFail($id);
         $assignedUser = User::findOrFail($request->assigned_to);
-        
+
         // Check if assigned user is a disposisi member
         if ($assignedUser->role !== 'disposisi') {
             return response()->json([
@@ -546,14 +523,14 @@ class TicketController extends Controller
                 'code' => 422
             ], 422);
         }
-        
+
         DB::beginTransaction();
         try {
             // Update ticket with assigned user
             $ticket->assigned_to = $assignedUser->id;
             $ticket->status = 'in_progress';
             $ticket->save();
-            
+
             // Create ticket history
             $history = new TicketHistory();
             $history->ticket_id = $ticket->id;
@@ -562,17 +539,17 @@ class TicketController extends Controller
             $history->assigned_to = $assignedUser->id;
             $history->timestamp = now();
             $history->save();
-            
+
             // Create notification for assigned user
             $this->notificationService->createAssignmentNotification($ticket, $user->id, $assignedUser->id);
-            
+
             // Update read flags
             $ticket->read_by_admin = true;
             $ticket->read_by_disposisi = false;
             $ticket->save();
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket assigned successfully',
@@ -589,10 +566,10 @@ class TicketController extends Controller
                     ]
                 ]
             ]);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to assign ticket: ' . $e->getMessage(),
@@ -600,140 +577,10 @@ class TicketController extends Controller
             ], 500);
         }
     }
-    
-    /**
-     * Get ticket statistics
-     * 
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function statistics()
-    {
-        $user = Auth::user();
-        $query = Ticket::query();
-        
-        // Apply role-based filtering
-        if ($user->role === 'student') {
-            // Students can only see stats for their own tickets
-            $query->where('user_id', $user->id);
-        } elseif ($user->role === 'disposisi') {
-            // Disposisi members can see stats for tickets assigned to them
-            $query->where('assigned_to', $user->id);
-        }
-        
-        // Calculate stats
-        $totalTickets = (clone $query)->count();
-        $newTickets = (clone $query)->where('status', 'open')->count();
-        $inProgressTickets = (clone $query)->where('status', 'in_progress')->count();
-        $resolvedTickets = (clone $query)->where('status', 'resolved')->count();
-        $closedTickets = (clone $query)->where('status', 'closed')->count();
-        
-        // Calculate unread based on user role
-        $unreadField = 'read_by_' . $user->role;
-        $unreadTickets = (clone $query)->where($unreadField, false)->count();
-        
-        // Get category distribution
-        $categoryStats = DB::table('tickets')
-            ->join('categories', 'tickets.category_id', '=', 'categories.id')
-            ->select('categories.id as category_id', 'categories.name as category_name', DB::raw('count(*) as count'))
-            ->when($user->role === 'student', function ($query) use ($user) {
-                return $query->where('tickets.user_id', $user->id);
-            })
-            ->when($user->role === 'disposisi', function ($query) use ($user) {
-                return $query->where('tickets.assigned_to', $user->id);
-            })
-            ->groupBy('categories.id', 'categories.name')
-            ->get();
-        
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'total' => $totalTickets,
-                'new' => $newTickets,
-                'in_progress' => $inProgressTickets,
-                'resolved' => $resolvedTickets,
-                'closed' => $closedTickets,
-                'unread' => $unreadTickets,
-                'by_category' => $categoryStats
-            ]
-        ]);
-    }
-    
-    /**
-     * Add a feedback/comment to a ticket
-     * 
-     * @param Request $request
-     * @param string $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function addFeedback(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'text' => 'required|string'
-        ]);
-        
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-                'code' => 422
-            ], 422);
-        }
-        
-        $user = Auth::user();
-        $ticket = Ticket::findOrFail($id);
-        
-        // Check authorization
-        if (!$this->authorizeTicketAccess($ticket, $user)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You are not authorized to add feedback to this ticket',
-                'code' => 403
-            ], 403);
-        }
-        
-        DB::beginTransaction();
-        try {
-            // Create feedback
-            $feedback = new TicketFeedback();
-            $feedback->ticket_id = $ticket->id;
-            $feedback->created_by = $user->id;
-            $feedback->text = $request->text;
-            $feedback->created_by_role = $user->role;
-            $feedback->save();
-            
-            // Create notifications based on the feedback sender
-            $this->notificationService->createFeedbackNotification($ticket, $user->id);
-            
-            // Reset read flags for other roles
-            $this->resetTicketReadFlags($ticket, $user->role);
-            
-            DB::commit();
-            
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Feedback added successfully',
-                'data' => [
-                    'id' => $feedback->id,
-                    'ticket_id' => $feedback->ticket_id,
-                    'created_by' => $feedback->created_by,
-                    'text' => $feedback->text,
-                    'created_by_role' => $feedback->created_by_role,
-                    'created_at' => $feedback->created_at
-                ]
-            ]);
-            
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to add feedback: ' . $e->getMessage(),
-                'code' => 500
-            ], 500);
-        }
-    }
-    
+
+
+
+
     /**
      * Soft delete a ticket
      * 
@@ -744,7 +591,7 @@ class TicketController extends Controller
     {
         $user = Auth::user();
         $ticket = Ticket::findOrFail($id);
-        
+
         // Only admins or the ticket creator can delete tickets
         if ($user->role !== 'admin' && $ticket->user_id !== $user->id) {
             return response()->json([
@@ -753,10 +600,10 @@ class TicketController extends Controller
                 'code' => 403
             ], 403);
         }
-        
+
         try {
             $ticket->delete();
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket has been soft deleted',
@@ -765,7 +612,7 @@ class TicketController extends Controller
                     'deleted_at' => $ticket->deleted_at
                 ]
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -774,7 +621,7 @@ class TicketController extends Controller
             ], 400);
         }
     }
-    
+
     /**
      * Restore a previously soft-deleted ticket
      * 
@@ -784,7 +631,7 @@ class TicketController extends Controller
     public function restore($id)
     {
         $user = Auth::user();
-        
+
         // Only admins can restore tickets
         if ($user->role !== 'admin') {
             return response()->json([
@@ -793,11 +640,11 @@ class TicketController extends Controller
                 'code' => 403
             ], 403);
         }
-        
+
         try {
             $ticket = Ticket::withTrashed()->findOrFail($id);
             $ticket->restore();
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Ticket has been restored',
@@ -806,7 +653,7 @@ class TicketController extends Controller
                     'deleted_at' => $ticket->deleted_at
                 ]
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -815,7 +662,7 @@ class TicketController extends Controller
             ], 400);
         }
     }
-    
+
     /**
      * Reveal the token for an anonymous ticket after password verification
      * 
@@ -841,7 +688,7 @@ class TicketController extends Controller
 
         // Get the ticket
         $ticket = Ticket::findOrFail($id);
-        
+
         // Check if the ticket is anonymous and has a token
         if (!$ticket->anonymous || empty($ticket->token)) {
             return response()->json([
@@ -850,15 +697,15 @@ class TicketController extends Controller
                 'code' => 400
             ], 400);
         }
-        
+
         // Get current authenticated user
         $user = Auth::user();
-        
+
         // If admin, allow access without password verification
         if ($user->role === 'admin') {
             // Store in session that token has been revealed
             session(['revealed_token_' . $ticket->id => true]);
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Token revealed successfully',
@@ -867,7 +714,7 @@ class TicketController extends Controller
                 ]
             ]);
         }
-        
+
         // Verify if this is the ticket creator by checking user_id
         if ($ticket->user_id !== $user->id) {
             return response()->json([
@@ -876,20 +723,20 @@ class TicketController extends Controller
                 'code' => 403
             ], 403);
         }
-        
+
         // Verify password
-        if (!Hash::check($request->password, $user->password)) {
+        if (!Hash::check($request->password, $user->getAuthPassword())) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Invalid password',
                 'code' => 401
             ], 401);
         }
-        
+
         // Password verified, reveal token
         // Store in session that token has been revealed
         session(['revealed_token_' . $ticket->id => true]);
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Token revealed successfully',
@@ -898,7 +745,7 @@ class TicketController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Create notifications for status changes
      * 
@@ -908,158 +755,27 @@ class TicketController extends Controller
      * @param string $newStatus
      * @return void
      */
-    private function createStatusChangeNotifications(Ticket $ticket, User $user, string $oldStatus, string $newStatus)
-    {
-        // Common notification message
-        $message = "Status tiket telah diperbarui dari {$oldStatus} menjadi {$newStatus}";
-        
-        if ($user->role === 'admin' || $user->role === 'disposisi') {
-            // Notify the student (ticket creator)
-            if ($ticket->user_id) {
-                $this->createTicketNotification(
-                    $ticket->user_id,
-                    'student',
-                    $user->id,
-                    $ticket->id,
-                    'Status Tiket Diperbarui',
-                    $message,
-                    'status_change'
-                );
-            }
-            
-            // If changed by disposisi, also notify admin
-            if ($user->role === 'disposisi') {
-                $this->createTicketNotification(
-                    null,
-                    'admin',
-                    $user->id,
-                    $ticket->id,
-                    'Status Tiket Diperbarui',
-                    $message,
-                    'status_change'
-                );
-            }
-            
-            // If changed by admin and ticket is assigned, notify disposisi
-            if ($user->role === 'admin' && $ticket->assigned_to) {
-                $this->createTicketNotification(
-                    $ticket->assigned_to,
-                    'disposisi',
-                    $user->id,
-                    $ticket->id,
-                    'Status Tiket Diperbarui',
-                    $message,
-                    'status_change'
-                );
-            }
-        } elseif ($user->role === 'student') {
-            // Student updated status (can only close tickets)
-            // Notify admin
-            $this->createTicketNotification(
-                null,
-                'admin',
-                $user->id,
-                $ticket->id,
-                'Status Tiket Diperbarui',
-                $message,
-                'status_change'
-            );
-            
-            // Notify assigned disposisi if any
-            if ($ticket->assigned_to) {
-                $this->createTicketNotification(
-                    $ticket->assigned_to,
-                    'disposisi',
-                    $user->id,
-                    $ticket->id,
-                    'Status Tiket Diperbarui',
-                    $message,
-                    'status_change'
-                );
-            }
-        }
-    }
-    
-    /**
-     * Create notifications for feedback
-     * 
-     * @param Ticket $ticket
-     * @param User $user
-     * @param TicketFeedback $feedback
-     * @return void
-     */
-    private function createFeedbackNotifications(Ticket $ticket, User $user, TicketFeedback $feedback)
-    {
-        $title = 'Feedback Baru';
-        $message = "Feedback baru untuk tiket: {$ticket->judul}";
-        
-        if ($user->role === 'admin' || $user->role === 'disposisi') {
-            // Notify the student (ticket creator)
-            if ($ticket->user_id) {
-                $this->createTicketNotification(
-                    $ticket->user_id,
-                    'student',
-                    $user->id,
-                    $ticket->id,
-                    $title,
-                    $message,
-                    'feedback'
-                );
-            }
-        } elseif ($user->role === 'student') {
-            // Notify admin
-            $this->createTicketNotification(
-                null,
-                'admin',
-                $user->id,
-                $ticket->id,
-                $title,
-                $message,
-                'feedback'
-            );
-            
-            // Notify assigned disposisi if any
-            if ($ticket->assigned_to) {
-                $this->createTicketNotification(
-                    $ticket->assigned_to,
-                    'disposisi',
-                    $user->id,
-                    $ticket->id,
-                    $title,
-                    $message,
-                    'feedback'
-                );
-            }
-        }
-    }
-    
-    /**
-     * Check if user is authorized to access a ticket
-     * 
-     * @param Ticket $ticket
-     * @param User $user
-     * @return bool
-     */
-    private function authorizeTicketAccess(Ticket $ticket, User $user)
+
+    private function authorizeTicketAccess(Ticket $ticket, User $user): bool
     {
         // Admin can access any ticket
         if ($user->role === 'admin') {
             return true;
         }
-        
+
         // Disposisi can access tickets assigned to them
         if ($user->role === 'disposisi' && $ticket->assigned_to === $user->id) {
             return true;
         }
-        
+
         // Students can only access their own tickets
         if ($user->role === 'student' && $ticket->user_id === $user->id) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Update read status of a ticket based on user role
      * 
@@ -1086,7 +802,7 @@ class TicketController extends Controller
             $this->markRelatedNotificationsAsRead($ticket, $user);
         }
     }
-    
+
     /**
      * Mark related notifications as read when a ticket is viewed
      * 
@@ -1102,7 +818,7 @@ class TicketController extends Controller
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
     }
-    
+
     /**
      * Reset read flags for other roles when a ticket is updated
      * 
@@ -1122,10 +838,10 @@ class TicketController extends Controller
             $ticket->read_by_admin = false;
             $ticket->read_by_disposisi = false;
         }
-        
+
         $ticket->save();
     }
-    
+
     /**
      * Format ticket response data for listing
      * 
@@ -1156,13 +872,13 @@ class TicketController extends Controller
             'created_at' => $ticket->created_at,
             'updated_at' => $ticket->updated_at
         ];
-        
+
         // Include token for admin users or if token has been revealed
         $user = Auth::user();
         if ($ticket->anonymous && $ticket->token && ($user->role === 'admin' || session('revealed_token_' . $ticket->id))) {
             $response['token'] = $ticket->token;
         }
-        
+
         // Include attachments if available
         if ($ticket->relationLoaded('attachments') && $ticket->attachments->count() > 0) {
             $response['lampiran'] = [
@@ -1172,121 +888,9 @@ class TicketController extends Controller
                 'file_url' => $ticket->attachments->first()->file_url
             ];
         }
-        
+
         return $response;
     }
-    
-    /**
-     * Format ticket response data for detailed view
-     * 
-     * @param Ticket $ticket
-     * @return array
-     */
-    private function formatTicketDetailResponse(Ticket $ticket)
-    {
-        $response = $this->formatTicketResponse($ticket);
-        
-        // Include histories and feedbacks
-        if ($ticket->relationLoaded('histories')) {
-            $response['ticket_histories'] = $ticket->histories->map(function ($history) {
-                return [
-                    'id' => $history->id,
-                    'action' => $history->action,
-                    'old_status' => $history->old_status,
-                    'new_status' => $history->new_status,
-                    'assigned_by' => $history->assigned_by,
-                    'assigned_to' => $history->assigned_to,
-                    'updated_by' => $history->updated_by,
-                    'timestamp' => $history->timestamp
-                ];
-            });
-        }
-        
-        if ($ticket->relationLoaded('feedbacks')) {
-            $response['ticket_feedbacks'] = $ticket->feedbacks->map(function ($feedback) {
-                return [
-                    'id' => $feedback->id,
-                    'created_by' => $feedback->created_by,
-                    'text' => $feedback->text,
-                    'created_by_role' => $feedback->created_by_role,
-                    'created_at' => $feedback->created_at
-                ];
-            });
-        }
-        
-        return $response;
-    }
-    
-       /**
-     * Export tickets to Excel with optional date range filtering
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function export(Request $request)
-    {
-        // Validate request data
-        $validator = Validator::make($request->all(), [
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-                'code' => 422
-            ], 422);
-        }
-
-        $user = Auth::user();
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-        
-        // Create export with filters
-        $export = new TicketExport(
-            $startDate,
-            $endDate,
-            $user->id,
-            $user->role
-        );
-        
-        // Get data from the export
-        $data = $export->collection();
-        $headings = $export->headings();
-        
-        // Generate CSV content
-        $csv = implode(',', $headings) . "\n";
-        
-        foreach ($data as $row) {
-            // Escape any fields that might contain commas or quotes
-            $escapedRow = array_map(function($field) {
-                if (is_string($field) && (strpos($field, ',') !== false || strpos($field, '"') !== false)) {
-                    return '"' . str_replace('"', '""', $field) . '"';
-                }
-                return $field;
-            }, $row);
-            
-            $csv .= implode(',', $escapedRow) . "\n";
-        }
-        
-        // Generate filename with date range if provided
-        $filename = 'tickets';
-        if ($startDate && $endDate) {
-            $filename .= '_' . date('Y-m-d', strtotime($startDate)) . '_to_' . date('Y-m-d', strtotime($endDate));
-        } elseif ($startDate) {
-            $filename .= '_from_' . date('Y-m-d', strtotime($startDate));
-        } elseif ($endDate) {
-            $filename .= '_until_' . date('Y-m-d', strtotime($endDate));
-        }
-        $filename .= '.csv';
-        
-        // Create response with CSV content
-        return response($csv, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ]);
-    }
     
 }
