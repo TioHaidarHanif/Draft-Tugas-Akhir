@@ -260,7 +260,7 @@ class TicketController extends Controller
         $query->withCount('chatMessages as chat_count');
         
         // Paginate results
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 100);
         $tickets = $query->paginate($perPage);
         
         return response()->json([
@@ -1072,13 +1072,35 @@ class TicketController extends Controller
         if ($user->role === 'admin' && !$ticket->read_by_admin) {
             $ticket->read_by_admin = true;
             $ticket->save();
+            // Mark related notifications as read
+            $this->markRelatedNotificationsAsRead($ticket, $user);
         } elseif ($user->role === 'disposisi' && !$ticket->read_by_disposisi && $ticket->assigned_to === $user->id) {
             $ticket->read_by_disposisi = true;
             $ticket->save();
+            // Mark related notifications as read
+            $this->markRelatedNotificationsAsRead($ticket, $user);
         } elseif ($user->role === 'student' && !$ticket->read_by_student && $ticket->user_id === $user->id) {
             $ticket->read_by_student = true;
             $ticket->save();
+            // Mark related notifications as read
+            $this->markRelatedNotificationsAsRead($ticket, $user);
         }
+    }
+    
+    /**
+     * Mark related notifications as read when a ticket is viewed
+     * 
+     * @param Ticket $ticket
+     * @param User $user
+     * @return void
+     */
+    private function markRelatedNotificationsAsRead(Ticket $ticket, User $user)
+    {
+        // Find all unread notifications for this ticket and this user
+        Notification::where('recipient_id', $user->id)
+            ->where('ticket_id', $ticket->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
     }
     
     /**

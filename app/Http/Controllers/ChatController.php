@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ChatAttachment;
 use App\Models\ChatMessage;
+use App\Models\Notification;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Services\ChatService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -47,7 +49,7 @@ class ChatController extends Controller
         }
 
         // Get chat messages with pagination
-        $perPage = $request->query('per_page', 15);
+        $perPage = $request->query('per_page', default: 100);
         $messages = $ticket->chatMessages()
             ->with(['user:id,name,email,role', 'attachments'])
             ->orderBy('created_at', 'asc') // Changed to ASC to match test expectations
@@ -55,8 +57,27 @@ class ChatController extends Controller
 
         // Mark messages as read by current user
         $this->chatService->markMessagesAsRead($messages->items(), Auth::id());
+        
+        // Mark related notifications as read
+        $this->markRelatedNotificationsAsRead($ticket, Auth::user());
 
         return response()->json($messages);
+    }
+
+    /**
+     * Mark related notifications as read when chat messages are viewed
+     * 
+     * @param Ticket $ticket
+     * @param \App\Models\User $user
+     * @return void
+     */
+    private function markRelatedNotificationsAsRead($ticket, $user)
+    {
+        // Find all unread notifications for this ticket and this user
+        Notification::where('recipient_id', $user->id)
+            ->where('ticket_id', $ticket->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
     }
 
     /**

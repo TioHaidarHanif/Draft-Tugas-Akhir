@@ -19,8 +19,8 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 15);
-$query = Notification::where('recipient_id', Auth::id())
-        ->with(['recipient:id,name', 'sender:id,name']);           
+        $query = Notification::where('recipient_id', Auth::id())
+            ->with(['recipient:id,name', 'sender:id,name', 'ticket:id,judul']);
         // Filter by read status
         if ($request->has('read')) {
             $readStatus = filter_var($request->input('read'), FILTER_VALIDATE_BOOLEAN);
@@ -30,15 +30,23 @@ $query = Notification::where('recipient_id', Auth::id())
                 $query->whereNull('read_at');
             }
         }
-        
+
         // Filter by notification type
         if ($request->has('type')) {
             $query->where('type', $request->input('type'));
         }
-        
+
         $notifications = $query->orderBy('created_at', 'desc')
             ->paginate($perPage);
-        
+
+        // Add ticket title if type is 'tiket'
+        $notifications->getCollection()->transform(function ($notification) {
+            if ($notification->type === 'tiket' && isset($notification->ticket)) {
+                $notification->ticket_title = $notification->ticket->title;
+            }
+            return $notification;
+        });
+
         return response()->json([
             'status' => 'success',
             'data' => [
