@@ -133,18 +133,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Add feedback to ticket (authorization checked in controller)
     Route::post('/tickets/{id}/feedback', [TicketController::class, 'addFeedback']);
     
-    // Soft delete ticket (authorization checked in controller)
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
     
-    // Admin-only ticket routes
-    Route::middleware('role:admin')->group(function () {
-        // Assign ticket to disposisi
-        Route::post('/tickets/{id}/assign', [TicketController::class, 'assign']);
-        
-        // Restore deleted ticket
-        Route::post('/tickets/{id}/restore', [TicketController::class, 'restore']);
-    });
-    
+   
     // Notification Routes
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);

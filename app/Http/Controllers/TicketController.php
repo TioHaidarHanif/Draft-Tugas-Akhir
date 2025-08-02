@@ -103,7 +103,6 @@ class TicketController extends Controller
                 'priority' => $request->input('priority', 'medium'),
                 'read_by_student' => true,
                 'read_by_admin' => false,
-                'read_by_disposisi' => false,
             ]);
 
             if ($ticket->anonymous) {
@@ -163,7 +162,40 @@ class TicketController extends Controller
     }
 
     /**
-     * Get list of tickets based on user role with various filters
+    * Get list of tickets based on user role with various filters
+    *
+    * Contoh penggunaan API:
+    * 
+    * GET /api/tickets
+    * 
+    * Query Parameters:
+    * - per_page: int (default: 100)
+    * - sortBy: string (created_at, status, category_id)
+    * - sortOrder: string (asc, desc)
+    * - user_id: int (filter by user)
+    * - status: string (open, in_progress, resolved, closed)
+    * - category_id: int
+    * - sub_category_id: int
+    * - search: string (search judul/deskripsi)
+    * - startDate: date (YYYY-MM-DD)
+    * - endDate: date (YYYY-MM-DD)
+    *
+    * Contoh:
+    * GET /api/tickets?status=open&category_id=2&search=ujian&per_page=10&sortBy=created_at&sortOrder=desc
+    *
+    * Response:
+    * {
+    *   "status": "success",
+    *   "data": {
+    *     "tickets": [ ... ],
+    *     "pagination": {
+    *       "total": 25,
+    *       "per_page": 10,
+    *       "current_page": 1,
+    *       "last_page": 3
+    *     }
+    *   }
+    * }
      * 
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -177,9 +209,6 @@ class TicketController extends Controller
         if ($user->role === 'student') {
             // Students can only see their own tickets
             $query->where('user_id', $user->id);
-        } elseif ($user->role === 'disposisi') {
-            // Disposisi members can see tickets assigned to them
-            $query->where('assigned_to', $user->id);
         }
         // Admin can see all tickets
 
@@ -259,6 +288,12 @@ class TicketController extends Controller
     public function show($id)
     {
         $user = Auth::user();
+        /**
+         * Retrieves a ticket by its ID along with its related category, sub-category, attachments,
+         * histories, and feedbacks. Also includes the count of associated chat messages as 'chat_count'.
+         *
+
+         */
         $ticket = Ticket::with(['category', 'subCategory', 'attachments', 'histories', 'feedbacks'])
             ->withCount('chatMessages as chat_count')
             ->findOrFail($id);
@@ -277,7 +312,7 @@ class TicketController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => [
+            'data' =>[
                 'ticket' => new TicketDetailResource($ticket)
             ]
         ]);
@@ -313,7 +348,6 @@ class TicketController extends Controller
         // Check authorization (admins and assigned disposisi can update status)
         if (
             $user->role !== 'admin' &&
-            !($user->role === 'disposisi' && $ticket->assigned_to === $user->id) &&
             !($user->role === 'student' && $ticket->user_id === $user->id)
         ) {
             return response()->json([
@@ -419,8 +453,7 @@ class TicketController extends Controller
 
         // Check authorization (admins and assigned disposisi can update priority)
         if (
-            $user->role !== 'admin' &&
-            !($user->role === 'disposisi' && $ticket->assigned_to === $user->id)
+            $user->role !== 'admin' 
         ) {
             return response()->json([
                 'status' => 'error',
@@ -479,104 +512,7 @@ class TicketController extends Controller
         }
     }
 
-    /**
-     * Assign a ticket to a disposisi member (Admin only)
-     * 
-     * @param Request $request
-     * @param string $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function assign(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'assigned_to' => 'required|exists:users,id'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()->all(),
-                'code' => 422
-            ], 422);
-        }
-
-        $user = Auth::user();
-
-        // Only admin can assign tickets
-        if ($user->role !== 'admin') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Only administrators can assign tickets',
-                'code' => 403
-            ], 403);
-        }
-
-        $ticket = Ticket::findOrFail($id);
-        $assignedUser = User::findOrFail($request->assigned_to);
-
-        // Check if assigned user is a disposisi member
-        if ($assignedUser->role !== 'disposisi') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Tickets can only be assigned to disposisi members',
-                'code' => 422
-            ], 422);
-        }
-
-        DB::beginTransaction();
-        try {
-            // Update ticket with assigned user
-            $ticket->assigned_to = $assignedUser->id;
-            $ticket->status = 'in_progress';
-            $ticket->save();
-
-            // Create ticket history
-            $history = new TicketHistory();
-            $history->ticket_id = $ticket->id;
-            $history->action = 'assignment';
-            $history->assigned_by = $user->id;
-            $history->assigned_to = $assignedUser->id;
-            $history->timestamp = now();
-            $history->save();
-
-            // Create notification for assigned user
-            $this->notificationService->createAssignmentNotification($ticket, $user->id, $assignedUser->id);
-
-            // Update read flags
-            $ticket->read_by_admin = true;
-            $ticket->read_by_disposisi = false;
-            $ticket->save();
-
-            DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Ticket assigned successfully',
-                'data' => [
-                    'id' => $ticket->id,
-                    'assigned_to' => $ticket->assigned_to,
-                    'updated_at' => $ticket->updated_at,
-                    'ticket_history' => [
-                        'id' => $history->id,
-                        'action' => $history->action,
-                        'assigned_by' => $history->assigned_by,
-                        'assigned_to' => $history->assigned_to,
-                        'timestamp' => $history->timestamp
-                    ]
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to assign ticket: ' . $e->getMessage(),
-                'code' => 500
-            ], 500);
-        }
-    }
+   
 
 
 
@@ -622,46 +558,6 @@ class TicketController extends Controller
         }
     }
 
-    /**
-     * Restore a previously soft-deleted ticket
-     * 
-     * @param string $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function restore($id)
-    {
-        $user = Auth::user();
-
-        // Only admins can restore tickets
-        if ($user->role !== 'admin') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Only administrators can restore tickets',
-                'code' => 403
-            ], 403);
-        }
-
-        try {
-            $ticket = Ticket::withTrashed()->findOrFail($id);
-            $ticket->restore();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Ticket has been restored',
-                'data' => [
-                    'id' => $ticket->id,
-                    'deleted_at' => $ticket->deleted_at
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to restore ticket: ' . $e->getMessage(),
-                'code' => 400
-            ], 400);
-        }
-    }
 
     /**
      * Reveal the token for an anonymous ticket after password verification
@@ -763,11 +659,7 @@ class TicketController extends Controller
             return true;
         }
 
-        // Disposisi can access tickets assigned to them
-        if ($user->role === 'disposisi' && $ticket->assigned_to === $user->id) {
-            return true;
-        }
-
+    
         // Students can only access their own tickets
         if ($user->role === 'student' && $ticket->user_id === $user->id) {
             return true;
@@ -790,11 +682,7 @@ class TicketController extends Controller
             $ticket->save();
             // Mark related notifications as read
             $this->markRelatedNotificationsAsRead($ticket, $user);
-        } elseif ($user->role === 'disposisi' && !$ticket->read_by_disposisi && $ticket->assigned_to === $user->id) {
-            $ticket->read_by_disposisi = true;
-            $ticket->save();
-            // Mark related notifications as read
-            $this->markRelatedNotificationsAsRead($ticket, $user);
+        
         } elseif ($user->role === 'student' && !$ticket->read_by_student && $ticket->user_id === $user->id) {
             $ticket->read_by_student = true;
             $ticket->save();
@@ -829,14 +717,10 @@ class TicketController extends Controller
     private function resetTicketReadFlags(Ticket $ticket, $currentUserRole)
     {
         if ($currentUserRole === 'admin') {
-            $ticket->read_by_disposisi = false;
             $ticket->read_by_student = false;
-        } elseif ($currentUserRole === 'disposisi') {
-            $ticket->read_by_admin = false;
-            $ticket->read_by_student = false;
+       
         } elseif ($currentUserRole === 'student') {
             $ticket->read_by_admin = false;
-            $ticket->read_by_disposisi = false;
         }
 
         $ticket->save();
@@ -867,7 +751,6 @@ class TicketController extends Controller
             'status' => $ticket->status,
             'assigned_to' => $ticket->assigned_to,
             'read_by_admin' => $ticket->read_by_admin,
-            'read_by_disposisi' => $ticket->read_by_disposisi,
             'read_by_student' => $ticket->read_by_student,
             'created_at' => $ticket->created_at,
             'updated_at' => $ticket->updated_at

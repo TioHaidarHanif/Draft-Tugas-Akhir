@@ -161,32 +161,6 @@ class TicketPriorityTest extends TestCase
         $response->assertStatus(422)
                  ->assertJsonValidationErrors(['priority']);
     }
-    
-    /**
-     * Test that disposisi can update ticket priority.
-     */
-    public function testDisposisiCanUpdatePriority(): void
-    {
-        // Create a ticket assigned to disposisi
-        $ticket = Ticket::factory()->create([
-            'user_id' => $this->student->id,
-            'priority' => 'medium',
-            'assigned_to' => $this->disposisi->id
-        ]);
-        
-        // Login as disposisi
-        $this->actingAs($this->disposisi);
-        
-        // Update priority to high
-        $response = $this->patchJson("/api/tickets/{$ticket->id}/priority", [
-            'priority' => 'high'
-        ]);
-        
-        // Assert success
-        $response->assertStatus(200)
-                 ->assertJsonPath('data.priority', 'high');
-    }
-    
     /**
      * Test that student cannot update ticket priority.
      */
