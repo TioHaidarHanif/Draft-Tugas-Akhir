@@ -42,9 +42,6 @@ class TicketExport
         if ($this->role === 'student' && $this->userId) {
             // Students can only see their own tickets
             $query->where('user_id', $this->userId);
-        } elseif ($this->role === 'disposisi' && $this->userId) {
-            // Disposisi members can see tickets assigned to them
-            $query->where('assigned_to', $this->userId);
         }
         
         $tickets = $query->get();

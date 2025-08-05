@@ -272,8 +272,6 @@ class ChatController extends Controller
         return (
             // Admin can access all tickets
             $user->role === 'admin' ||
-            // Disposisi can access assigned tickets
-            ($user->role === 'disposisi' && $ticket->assigned_to === $user->id) ||
             // Students can access their own tickets
             ($user->role === 'student' && $ticket->user_id === $user->id)
         );

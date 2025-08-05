@@ -14,7 +14,7 @@ class FAQTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_create_a_faq()
     {
         $category = Category::factory()->create();
@@ -42,7 +42,7 @@ class FAQTest extends TestCase
         $this->assertTrue($faq->is_public);
     }
     
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_be_soft_deleted()
     {
         $faq = FAQ::factory()->create();
@@ -52,7 +52,7 @@ class FAQTest extends TestCase
         $this->assertSoftDeleted('faqs', ['id' => $faq->id]);
     }
     
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_belongs_to_a_category()
     {
         $category = Category::factory()->create();
@@ -62,7 +62,7 @@ class FAQTest extends TestCase
         $this->assertEquals($category->id, $faq->category->id);
     }
     
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_belongs_to_a_user()
     {
         $user = User::factory()->create();
@@ -72,7 +72,7 @@ class FAQTest extends TestCase
         $this->assertEquals($user->id, $faq->user->id);
     }
     
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_be_created_from_a_ticket()
     {
         $category = Category::factory()->create();
@@ -97,7 +97,7 @@ class FAQTest extends TestCase
         $this->assertEquals($ticket->id, $faq->ticket->id);
     }
     
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_increment_view_count()
     {
         $faq = FAQ::factory()->create(['view_count' => 0]);

@@ -15,8 +15,8 @@ class FAQControllerTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    /** @test */
-    public function it_can_list_public_faqs()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_list_public_faqs()
     {
         $category = Category::factory()->create();
         FAQ::factory()->count(5)->create([
@@ -58,8 +58,8 @@ class FAQControllerTest extends TestCase
             ]);
     }
 
-    /** @test */
-    public function it_can_filter_faqs_by_category()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_filter_faqs_by_category()
     {
         $category1 = Category::factory()->create();
         $category2 = Category::factory()->create();
@@ -80,8 +80,8 @@ class FAQControllerTest extends TestCase
             ->assertJsonCount(3, 'data.data');
     }
 
-    /** @test */
-    public function it_can_search_faqs_by_keyword()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_search_faqs_by_keyword()
     {
         FAQ::factory()->create([
             'question' => 'How do I reset my password?',
@@ -102,8 +102,8 @@ class FAQControllerTest extends TestCase
             ->assertJsonPath('data.data.0.question', 'How do I reset my password?');
     }
 
-    /** @test */
-    public function it_can_show_a_public_faq()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_show_a_public_faq()
     {
         $faq = FAQ::factory()->create(['is_public' => true]);
 
@@ -124,8 +124,8 @@ class FAQControllerTest extends TestCase
         $this->assertEquals($faq->view_count + 1, $faq->fresh()->view_count);
     }
 
-    /** @test */
-    public function it_cannot_show_a_private_faq_to_guest()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_cannot_show_a_private_faq_to_guest()
     {
         $faq = FAQ::factory()->create(['is_public' => false]);
 
@@ -134,8 +134,8 @@ class FAQControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
-    public function it_can_show_a_private_faq_to_admin()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_show_a_private_faq_to_admin()
     {
         $admin = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($admin);
@@ -156,8 +156,8 @@ class FAQControllerTest extends TestCase
             ]);
     }
 
-    /** @test */
-    public function it_can_list_faq_categories()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_list_faq_categories()
     {
         $category1 = Category::factory()->create();
         $category2 = Category::factory()->create();
@@ -180,8 +180,8 @@ class FAQControllerTest extends TestCase
             ->assertJsonPath('data.1.faqs_count', 2);
     }
 
-    /** @test */
-    public function it_can_create_a_faq_as_admin()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_create_a_faq_as_admin()
     {
         $admin = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($admin);
@@ -216,8 +216,8 @@ class FAQControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_cannot_create_a_faq_as_non_admin()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_cannot_create_a_faq_as_non_admin()
     {
         $user = User::factory()->create(['role' => 'student']);
         Sanctum::actingAs($user);
@@ -240,8 +240,8 @@ class FAQControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_can_update_a_faq_as_admin()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_update_a_faq_as_admin()
     {
         $admin = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($admin);
@@ -276,8 +276,8 @@ class FAQControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_can_delete_a_faq_as_admin()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_delete_a_faq_as_admin()
     {
         $admin = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($admin);
@@ -297,8 +297,8 @@ class FAQControllerTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_can_convert_ticket_to_faq_as_admin()
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function test_can_convert_ticket_to_faq_as_admin()
     {
         $admin = User::factory()->create(['role' => 'admin']);
         Sanctum::actingAs($admin);
