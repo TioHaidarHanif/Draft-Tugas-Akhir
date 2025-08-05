@@ -130,9 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update ticket priority (authorization checked in controller)
     Route::patch('/tickets/{id}/priority', [TicketController::class, 'updatePriority']);
     
-    // Add feedback to ticket (authorization checked in controller)
-    Route::post('/tickets/{id}/feedback', [TicketController::class, 'addFeedback']);
-    
+ 
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
     
    
